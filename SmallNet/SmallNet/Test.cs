@@ -36,9 +36,11 @@ namespace SmallNet
         {
 
             BaseHost host = new BaseHost();
+            host.Debug = true;
             host.start();
 
             BaseClient client = new BaseClient();
+            client.Debug = true;
             client.connectTo(host.IpAddress, "notBen");
 
             client.sendMessage("testType", "abc", "123");

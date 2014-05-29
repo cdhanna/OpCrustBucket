@@ -18,6 +18,8 @@ namespace SmallNet
 
         private Thread recieverThread;
 
+        public Boolean Debug { get; set; }
+
         public BaseClient()
         {
             // client initialization
@@ -25,12 +27,30 @@ namespace SmallNet
             this.connected = false;
         }
 
+        /// <summary>
+        /// call this to log a message. It will only display if the Debug variable is true. It will be prefaced with "cleint: "
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="vars"></param>
+        private void log(string str)
+        {
+            if (Debug)
+            {
+                Console.WriteLine("client: " + str);
+            }
+        }
         
+        /// <summary>
+        /// attempt to connect a server at the ipaddress
+        /// </summary>
+        /// <param name="hostIpAddress"></param>
+        /// <param name="credentials"></param>
         public void connectTo(String hostIpAddress, String credentials)
         {
             if (this.connected)
             {
                 //Error. Cannot connect, because client already has a connection
+                log("error! cannot connect because client already has a connection.");
                 return;
             }
 
@@ -51,11 +71,14 @@ namespace SmallNet
             }
             this.recieverThread = new Thread(() =>
                 {
-                    //decode incoming messages, and pass them to the recievedMessage()
-                    string receivedMsg = netReader.ReadLine();
-
-                    Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
-                    receieveMessage(data.Item1, data.Item2);
+                    while (true)
+                    {
+                        //decode incoming messages, and pass them to the recievedMessage()
+                        string receivedMsg = netReader.ReadLine();
+                        log("recieved msg- " + receivedMsg);
+                        Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
+                        receieveMessage(data.Item1, data.Item2);
+                    }
                 });
             this.recieverThread.Start();
             this.connected = true;
@@ -73,7 +96,7 @@ namespace SmallNet
         public void receieveMessage(string msgType, params string[] paramterStrings)
         {
             //do something with messages from server
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void sendMessage(string msgType, params object[] parameters)
@@ -83,13 +106,14 @@ namespace SmallNet
 
             //send the message
             this.netWriter.WriteLine(msg, parameters);
-
+            log("send msg- " + msg);
         }
 
         public void shutdown()
         {
             this.disconnect();
             this.recieverThread.Abort();
+            log("shutdown");
         }
 
 
