@@ -24,7 +24,7 @@ namespace SmallNet
         /// </summary>
         void shutdown();
 
-        protected void receieveMessage(string msgType, params string[] paramterStrings);
+        void receieveMessage(string msgType, params string[] paramterStrings);
         
         /// <summary>
         /// 

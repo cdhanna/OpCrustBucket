@@ -7,12 +7,12 @@ namespace SmallNet
 {
     interface Host
     {
-        void acceptConnection();
-        void acceptDisconnect();
+       // void acceptConnection();
+       // void acceptDisconnect();
         
-        void sendMessage();
-        void receiveMessage();
-        void broadCastMessage();
+       // void sendMessage();
+       // void receiveMessage();
+       // void broadCastMessage();
         
 
     }

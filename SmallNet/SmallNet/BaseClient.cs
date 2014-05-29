@@ -70,7 +70,7 @@ namespace SmallNet
             this.connected = false;
         }
 
-        protected void receieveMessage(string msgType, params string[] paramterStrings)
+        public void receieveMessage(string msgType, params string[] paramterStrings)
         {
             //do something with messages from server
             throw new NotImplementedException();

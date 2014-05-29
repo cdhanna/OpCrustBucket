@@ -41,6 +41,7 @@ namespace SmallNet
                     recieveMessage(data.Item1, data.Item2);
                 }
             });
+            this.recieverThread.Start();
         }
 
         protected void recieveMessage(string msgType , params string[] parameters)
@@ -48,6 +49,7 @@ namespace SmallNet
             //TODO validate message
             //TODO apply message
             //TODO broadcast message
+            Console.WriteLine("got msg " + msgType);
         }
 
         public void sendMessage(string msgType, params object[] parameters)

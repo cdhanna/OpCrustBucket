@@ -34,7 +34,14 @@ namespace SmallNet
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+
+            BaseHost host = new BaseHost();
+            host.start();
+
+            BaseClient client = new BaseClient();
+            client.connectTo(host.IpAddress, "notBen");
+
+            client.sendMessage("testType", "abc", "123");
 
             base.Initialize();
         }

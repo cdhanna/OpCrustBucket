@@ -12,25 +12,29 @@ namespace SmallNet
     {
         private TcpListener tcpListener;
         private string ipAddress;
-
         private Thread clientAcceptorThread;
-
         private NetModel model;
+
+        public string IpAddress { get { return this.ipAddress; } }
 
         public BaseHost()
         {
             this.model = new NetModel();
 
-            this.ipAddress = ""; // TODO, fix
+            this.ipAddress = SNetUtil.getLocalIp();
             this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
             this.clientAcceptorThread = new Thread(() =>
             {
-                //accept a new client
-                Socket socket = tcpListener.AcceptSocket();
-                
-                //create clientProxy, which puts it into the model
-                BaseClientProxy client = new BaseClientProxy(socket, model);
-                
+                Console.WriteLine("server waiting");
+                while (true)
+                {
+                    //accept a new client
+                    Socket socket = tcpListener.AcceptSocket();
+                    Console.WriteLine("got a connection");
+                    //create clientProxy, which puts it into the model
+                    BaseClientProxy client = new BaseClientProxy(socket, model);
+                }
+                Console.WriteLine("server done waiting");
             });
         }
 
