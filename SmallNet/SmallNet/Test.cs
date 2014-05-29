@@ -42,6 +42,7 @@ namespace SmallNet
             client.connectTo(host.IpAddress, "notBen");
 
             client.sendMessage("testType", "abc", "123");
+            // hooray for cheese
 
             base.Initialize();
         }
