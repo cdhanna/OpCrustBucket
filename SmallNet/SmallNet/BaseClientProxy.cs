@@ -6,11 +6,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Threading;
+using log4net;
+
 
 namespace SmallNet
 {
     class BaseClientProxy 
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private Socket socket;
         private StreamReader netReader;
         private StreamWriter netWriter;
@@ -31,19 +35,6 @@ namespace SmallNet
             this.startRecieverThread();
         }
 
-        /// <summary>
-        /// call this to log a message. It will only display if the Debug variable is true. It will be prefaced with "host-client-proxy: "
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="vars"></param>
-        private void log(string str)
-        {
-            if (Debug)
-            {
-                Console.WriteLine("host-client-proxy: " + str);
-            }
-        }
-
         private void startRecieverThread()
         {
             this.recieverThread = new Thread(() =>
@@ -51,7 +42,7 @@ namespace SmallNet
                 while (true) //listen forever
                 {
                     string netMessage = netReader.ReadLine();
-                    log("recieved msg- " + netMessage);
+                    log.Debug("recieved msg- " + netMessage);
                     Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
                     recieveMessage(data.Item1, data.Item2);
                 }
@@ -72,7 +63,8 @@ namespace SmallNet
         {
             string msg = SNetUtil.encodeMessage(msgType, parameters);
             this.netWriter.WriteLine(msg, parameters);
-            log("send msg- " + msg);
+            log.Debug("send msg- " + msg);
+            
         }
     }
 }

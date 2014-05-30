@@ -6,11 +6,14 @@ using System.IO;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using log4net;
 
 namespace SmallNet
 {
     class BaseClient : Client
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private StreamWriter netWriter;
         private StreamReader netReader;
         private TcpClient tcp;
@@ -27,18 +30,6 @@ namespace SmallNet
             this.connected = false;
         }
 
-        /// <summary>
-        /// call this to log a message. It will only display if the Debug variable is true. It will be prefaced with "cleint: "
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="vars"></param>
-        private void log(string str)
-        {
-            if (Debug)
-            {
-                Console.WriteLine("client: " + str);
-            }
-        }
         
         /// <summary>
         /// attempt to connect a server at the ipaddress
@@ -50,7 +41,7 @@ namespace SmallNet
             if (this.connected)
             {
                 //Error. Cannot connect, because client already has a connection
-                log("error! cannot connect because client already has a connection.");
+                log.Debug("error! cannot connect because client already has a connection.");
                 return;
             }
 
@@ -75,7 +66,7 @@ namespace SmallNet
                     {
                         //decode incoming messages, and pass them to the recievedMessage()
                         string receivedMsg = netReader.ReadLine();
-                        log("recieved msg- " + receivedMsg);
+                        log.Debug("recieved msg- " + receivedMsg);
                         Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
                         receieveMessage(data.Item1, data.Item2);
                     }
@@ -91,6 +82,7 @@ namespace SmallNet
             this.sendMessage(SNetProp.CLIENT_DISCONNECT_NOTIFICATION);
             this.tcp.Close();
             this.connected = false;
+            log.Debug("disconnect");
         }
 
         public void receieveMessage(string msgType, params string[] paramterStrings)
@@ -106,14 +98,14 @@ namespace SmallNet
 
             //send the message
             this.netWriter.WriteLine(msg, parameters);
-            log("send msg- " + msg);
+            log.Debug("send msg- " + msg);
         }
 
         public void shutdown()
         {
             this.disconnect();
             this.recieverThread.Abort();
-            log("shutdown");
+            log.Debug("shutdown");
         }
 
 

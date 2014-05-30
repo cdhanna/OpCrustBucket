@@ -5,11 +5,16 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using log4net;
+
+
 namespace SmallNet
 {
    
     class BaseHost : Host
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
         private TcpListener tcpListener;
         private string ipAddress;
         private Thread clientAcceptorThread;
@@ -27,7 +32,7 @@ namespace SmallNet
             this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
             this.clientAcceptorThread = new Thread(() =>
             {
-                log("client acceptor thread is starting...");
+                log.Debug("client acceptor thread is starting...");
                 while (true)
                 {
                     //accept a new client
@@ -35,22 +40,9 @@ namespace SmallNet
                     //create clientProxy, which puts it into the model
                     BaseClientProxy client = new BaseClientProxy(socket, model);
                     client.Debug = Debug;
-                    log("got a connection");
+                    log.Debug("got a connection");
                 }
             });
-        }
-
-        /// <summary>
-        /// call this to log a message. It will only display if the Debug variable is true. It will be prefaced with "host: "
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="vars"></param>
-        private void log(string str)
-        {
-            if (Debug)
-            {
-                Console.WriteLine("host: " + str);
-            }
         }
 
         public void start()
