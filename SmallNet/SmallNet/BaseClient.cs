@@ -80,6 +80,7 @@ namespace SmallNet
         public void disconnect()
         {
             this.sendMessage(SNetProp.CLIENT_DISCONNECT_NOTIFICATION);
+            this.recieverThread.Abort();
             this.tcp.Close();
             this.connected = false;
             log.Debug("disconnect");

@@ -25,6 +25,11 @@ namespace SmallNet
             client.connectTo(host.IpAddress, "notBen");
 
             client.sendMessage("testType", "abc", "123");
+
+            System.Threading.Thread.Sleep(500);
+
+            client.shutdown();
+            host.shutdown();
         }
 
     }

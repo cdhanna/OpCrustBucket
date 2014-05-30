@@ -24,6 +24,10 @@ namespace SmallNet
         {
             this.clients.Add(client);
         }
+        public void removeClient(BaseClientProxy client)
+        {
+            this.clients.Remove(client);
+        }
 
         public void sendMessageToAll(string msgType, params object[] parameters)
         {

@@ -35,15 +35,29 @@ namespace SmallNet
             this.startRecieverThread();
         }
 
+        private void removeFromModel()
+        {
+            this.model.removeClient(this);
+            log.Debug("client removed from net model");
+        }
         private void startRecieverThread()
         {
             this.recieverThread = new Thread(() =>
             {
-                while (true) //listen forever
+                bool loop = true;
+                while (loop) //listen forever
                 {
                     string netMessage = netReader.ReadLine();
                     log.Debug("recieved msg- " + netMessage);
                     Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
+
+                    if (data.Item1.Equals(SNetProp.CLIENT_DISCONNECT_NOTIFICATION))
+                    {
+                        loop = false;
+                        removeFromModel();
+                        
+                    }
+
                     recieveMessage(data.Item1, data.Item2);
                 }
             });
