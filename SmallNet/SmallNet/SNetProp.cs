@@ -7,8 +7,11 @@ namespace SmallNet
 {
     class SNetProp
     {
-        public const string CLIENT_DISCONNECT_NOTIFICATION = "c_h_disc";
-        public const string CLIENT_CREDENTIALS = "c_h_cred";
+
+
+        public const string DISCONNECT_NOTIFICATION = "disc";
+        public const string CREDENTIALS = "cred";
+        public const string CREATE_NEW_CLIENT_MODEL = "newmodel";
 
         public static int getPort()
         {

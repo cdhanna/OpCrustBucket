@@ -6,12 +6,12 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using log4net;
-
+using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
    
-    class BaseHost : Host
+    class BaseHost<T> : Host where T:ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -20,15 +20,15 @@ namespace SmallNet
         private Thread clientAcceptorThread;
         private bool clientAcceptorThreadRunner;
         
-        private NetModel model;
+        private NetModel<T> model;
         public Boolean Debug { get; set; }
         public string IpAddress { get { return this.ipAddress; } }
 
-        public NetModel Model { get { return this.model; } }
+        public NetModel<T> Model { get { return this.model; } }
 
         public BaseHost()
         {
-            this.model = new NetModel();
+            this.model = new NetModel<T>();
            
             this.ipAddress = SNetUtil.getLocalIp();
             this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
@@ -42,14 +42,16 @@ namespace SmallNet
                         //accept a new client
                         Socket socket = tcpListener.AcceptSocket();
                         //create clientProxy, which puts it into the model
-                        BaseClientProxy client = new BaseClientProxy(socket, model);
+                        BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model);
+                        client.sendMessage(SNetProp.CREATE_NEW_CLIENT_MODEL);
                         client.Debug = Debug;
                         log.Debug("got a connection");
+                        this.model.addClient(client);
                     }
                 }
                 catch (Exception e)
                 {
-                    log.Debug("client acceptor thread has crashed...");
+                    log.Debug("client acceptor thread has stopped... " + e.Message);
                 }
             });
         }
@@ -63,15 +65,27 @@ namespace SmallNet
 
         public void shutdown()
         {
-            this.tcpListener.Stop();
-            this.clientAcceptorThreadRunner = false;
-            this.clientAcceptorThread.Abort();
-            log.Debug("host shutdown");
+            try
+            {
+                this.tcpListener.Stop();
+                this.clientAcceptorThreadRunner = false;
+                this.clientAcceptorThread.Abort();
+
+                log.Debug("host shutdown");
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         public void sendMessageToAll(string msgType, params object[] parameters)
         {
             this.model.sendMessageToAll(msgType, parameters);
+        }
+
+        public void update(GameTime time)
+        {
+            this.model.update(time);
         }
     }
 }

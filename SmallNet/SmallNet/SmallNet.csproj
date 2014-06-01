@@ -43,6 +43,7 @@
     <Compile Include="BaseClientProxy.cs" />
     <Compile Include="BaseHost.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="ClientModel.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="SimpleNetTest.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Test.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClientModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="log4net">

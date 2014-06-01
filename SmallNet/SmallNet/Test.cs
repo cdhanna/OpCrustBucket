@@ -18,7 +18,8 @@ namespace SmallNet
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
+        BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
         public Test()
             : base()
         {
@@ -34,17 +35,15 @@ namespace SmallNet
         /// </summary>
         protected override void Initialize()
         {
-
-            BaseHost host = new BaseHost();
+            //this.TargetElapsedTime = TimeSpan.FromSeconds(1);
+            
             host.Debug = true;
             host.start();
 
-            BaseClient client = new BaseClient();
             client.Debug = true;
             client.connectTo(host.IpAddress, "notBen");
 
-            client.sendMessage("testType", "abc", "123");
-            // hooray for cheese
+            Console.WriteLine("init");
 
             base.Initialize();
         }
@@ -57,7 +56,7 @@ namespace SmallNet
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            Console.WriteLine("load");
             // TODO: use this.Content to load your game content here
         }
 
@@ -79,8 +78,9 @@ namespace SmallNet
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            // TODO: Add your update logic here
+            
+            client.update(gameTime);
+            host.update(gameTime);
 
             base.Update(gameTime);
         }

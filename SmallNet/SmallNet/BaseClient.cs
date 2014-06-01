@@ -7,10 +7,11 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using log4net;
+using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class BaseClient : Client
+    class BaseClient <T> : Client where T : ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -20,6 +21,9 @@ namespace SmallNet
         private bool connected;
 
         private Thread recieverThread;
+
+        private T clientModel;
+
 
         public Boolean Debug { get; set; }
 
@@ -54,7 +58,7 @@ namespace SmallNet
 
             this.netWriter.AutoFlush = true;
 
-            this.sendMessage(SNetProp.CLIENT_CREDENTIALS, credentials);
+            this.sendMessage(SNetProp.CREDENTIALS, credentials);
 
             if (this.recieverThread != null)
             {
@@ -62,14 +66,22 @@ namespace SmallNet
             }
             this.recieverThread = new Thread(() =>
                 {
-                    while (true)
+                    try
                     {
-                        //decode incoming messages, and pass them to the recievedMessage()
-                        string receivedMsg = netReader.ReadLine();
-                        log.Debug("recieved msg- " + receivedMsg);
-                        Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
-                        receieveMessage(data.Item1, data.Item2);
+                        while (true)
+                        {
+                            //decode incoming messages, and pass them to the recievedMessage()
+                            string receivedMsg = netReader.ReadLine();
+                            log.Debug("recieved msg- " + receivedMsg);
+                            Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
+                            receieveMessage(data.Item1, data.Item2);
+                        }
                     }
+                    catch (Exception e)
+                    {
+                        log.Debug("client reciever has stopped");
+                    }
+
                 });
             this.recieverThread.Start();
             this.connected = true;
@@ -79,15 +91,32 @@ namespace SmallNet
 
         public void disconnect()
         {
-            this.sendMessage(SNetProp.CLIENT_DISCONNECT_NOTIFICATION);
-            this.recieverThread.Abort();
-            this.tcp.Close();
-            this.connected = false;
-            log.Debug("disconnect");
+            try
+            {
+                this.clientModel.destroy();
+                
+                this.sendMessage(SNetProp.DISCONNECT_NOTIFICATION);
+                this.recieverThread.Abort();
+                this.tcp.Close();
+                this.connected = false;
+                log.Debug("disconnect");
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         public void receieveMessage(string msgType, params string[] paramterStrings)
         {
+            if (msgType.Equals(SNetProp.CREATE_NEW_CLIENT_MODEL))
+            {
+                //create a new client model
+                this.clientModel = (T) typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                this.clientModel.init("client");
+            }
+
+
+
             //do something with messages from server
             //throw new NotImplementedException();
         }
@@ -109,7 +138,14 @@ namespace SmallNet
             log.Debug("shutdown");
         }
 
-
+        public void update(GameTime time)
+        {
+            
+            if (this.clientModel != null)
+            {
+                this.clientModel.update(time);
+            }
+        }
 
     }
 }

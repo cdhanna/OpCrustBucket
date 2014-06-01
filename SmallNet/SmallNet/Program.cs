@@ -18,9 +18,9 @@ namespace SmallNet
         [STAThread]
         static void Main()
         {
-            SimpleNetTest test = new SimpleNetTest();
-           // using (var game = new Test())
-           //     game.Run();
+            //SimpleNetTest test = new SimpleNetTest();
+            using (var game = new Test())
+                game.Run();
         }
     }
 #endif

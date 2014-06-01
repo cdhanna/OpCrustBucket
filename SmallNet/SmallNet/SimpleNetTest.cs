@@ -16,11 +16,12 @@ namespace SmallNet
            
             log.Debug("Starting");
 
-            BaseHost host = new BaseHost();
+            BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
+            log.Debug("IPaddress " + host.IpAddress);
             host.Debug = true;
             host.start();
 
-            BaseClient client = new BaseClient();
+            BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
             client.Debug = true;
             client.connectTo(host.IpAddress, "notBen");
 
