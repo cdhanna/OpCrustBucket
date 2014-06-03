@@ -87,6 +87,7 @@ namespace SmallNet
             //TODO broadcast message
 
             //this.sendMessage(msgType, parameters);
+            this.model.sendMessageToAll(msgType, parameters);
         }
 
         public void sendMessage(string msgType, params object[] parameters)

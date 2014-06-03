@@ -20,6 +20,9 @@ namespace SmallNet
         SpriteBatch spriteBatch;
         BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
         BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
+
+
+
         public Test()
             : base()
         {
@@ -41,7 +44,7 @@ namespace SmallNet
             host.start();
 
             client.Debug = true;
-            client.connectTo(host.IpAddress, "notBen");
+            client.connectTo("192.168.1.22", "WillTest");
 
             Console.WriteLine("init");
 
