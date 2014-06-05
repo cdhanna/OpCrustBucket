@@ -44,7 +44,7 @@ namespace SmallNet
             host.start();
 
             client.Debug = true;
-            client.connectTo("192.168.1.22", "WillTest");
+            client.connectTo("192.168.1.11", "WillTest");
 
             Console.WriteLine("init");
 

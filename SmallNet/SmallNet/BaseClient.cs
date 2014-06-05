@@ -9,6 +9,7 @@ using System.Threading;
 using log4net;
 using Microsoft.Xna.Framework;
 
+
 namespace SmallNet
 {
     class BaseClient <T> : Client where T : ClientModel
@@ -23,6 +24,7 @@ namespace SmallNet
         private Thread recieverThread;
 
         private T clientModel;
+        private System.Timers.Timer connectTimer;
 
 
         public Boolean Debug { get; set; }
@@ -32,9 +34,18 @@ namespace SmallNet
             // client initialization
             this.tcp = new TcpClient();
             this.connected = false;
+            this.connectTimer = new System.Timers.Timer(2000);
+            this.connectTimer.Elapsed += new System.Timers.ElapsedEventHandler(ConnectTimerTimeOut);
+        }
+        private void ConnectTimerTimeOut(object source, System.Timers.ElapsedEventArgs e)
+        {
+            log.Debug(" connection timeout");
+            this.connectTimer.Enabled = false;
+            this.tcp.Close();
         }
 
-        
+
+
         /// <summary>
         /// attempt to connect a server at the ipaddress
         /// </summary>
@@ -49,8 +60,20 @@ namespace SmallNet
                 return;
             }
 
+            this.connectTimer.Enabled = true;
+
             //initiate the connection
-            this.tcp.Connect(hostIpAddress, SNetProp.getPort());
+            try
+            {
+                this.tcp.Connect(hostIpAddress, SNetProp.getPort());
+            }
+            catch (SocketException e)
+            {
+                return;
+            }
+
+
+            this.connectTimer.Enabled = false;
             //initiate the data-flow streams
             Stream netStream = this.tcp.GetStream();
             this.netWriter = new StreamWriter(netStream);
