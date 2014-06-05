@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 using System.Net;
 namespace SmallNet
 {
@@ -70,6 +71,38 @@ namespace SmallNet
             return localIP;
 
         }
+
+        /// <summary>
+        /// discover a list of all other IP addresses on the LAN
+        /// </summary>
+        public static List<string> discoverIps()
+        {
+            List<string> networkIPs = new List<string>();
+
+            // Start the child process.
+            Process p = new Process();
+            // Redirect the output stream of the child process.
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = "arp";
+            p.StartInfo.Arguments = "-a";
+            p.Start();
+
+            string line = null;
+            while (!p.StandardOutput.EndOfStream){
+                line = p.StandardOutput.ReadLine();
+                if (line.Contains("dynamic"))
+                {
+                    line = line.Substring(0, "123.123.123.123  ".Length);
+                    line = line.Replace(" ", "");
+                    networkIPs.Add(line);
+                    Console.WriteLine(line);
+                }
+            }
+            p.WaitForExit();
+            return networkIPs;
+        }
+
 
     }
 }
