@@ -18,10 +18,10 @@ namespace SmallNet
         [STAThread]
         static void Main()
         {
-            SNetUtil.discoverIps();
+           
             //SimpleNetTest test = new SimpleNetTest();
-            //using (var game = new Test())
-            //    game.Run();
+            using (var game = new Test())
+                game.Run();
         }
     }
 #endif

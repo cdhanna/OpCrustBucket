@@ -39,7 +39,9 @@ namespace SmallNet
         protected override void Initialize()
         {
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1);
-            
+
+            SNetUtil.discoverIps();
+
             host.Debug = true;
             host.start();
 
