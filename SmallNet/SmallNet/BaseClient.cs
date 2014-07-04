@@ -114,6 +114,11 @@ namespace SmallNet
 
         public void disconnect()
         {
+            if (!this.connected)
+            {
+                log.Debug("has already disonnected");
+                return;
+            }
             try
             {
                 this.clientModel.destroy();
@@ -126,6 +131,7 @@ namespace SmallNet
             }
             catch (Exception e)
             {
+                log.Debug("disconnect did not finish");
             }
         }
 
@@ -134,26 +140,30 @@ namespace SmallNet
             if (msgType.Equals(SNetProp.CREATE_NEW_CLIENT_MODEL))
             {
                 //create a new client model
-                this.clientModel = (T) typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-                this.clientModel.init("client");
+                this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+                this.clientModel.create(this.netWriter, "client");
             }
-
-
-
-            //do something with messages from server
-            //throw new NotImplementedException();
+            else
+            {
+                this.clientModel.onMessage(msgType, paramterStrings); // no need to validate it here, because it has already been validated server side.
+            }
         }
 
         public void sendMessage(string msgType, params object[] parameters)
         {
             //construct a message
-            string msg = SNetUtil.encodeMessage(msgType, parameters);
+            if (this.clientModel == null) // this is only true on the first case
+            {
+                String msg = SNetUtil.encodeMessage(msgType, parameters);
+                this.netWriter.WriteLine(msg, parameters);
+            }
+            else
+            {
+                //log.Debug("send msg- " + msg);
+                this.clientModel.sendMessage(msgType, parameters);
 
-            //send the message
-            this.netWriter.WriteLine(msg, parameters);
-            log.Debug("send msg- " + msg);
+            }
         }
-
         public void shutdown()
         {
             this.disconnect();

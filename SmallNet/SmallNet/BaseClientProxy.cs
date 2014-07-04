@@ -35,7 +35,7 @@ namespace SmallNet
             this.model = model;
 
             this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            this.clientModel.init("host");
+            this.clientModel.create(this.netWriter, "host");
 
             this.startRecieverThread();
         }
@@ -82,20 +82,22 @@ namespace SmallNet
 
         protected void recieveMessage(string msgType , params string[] parameters)
         {
-            //TODO validate message
-            //TODO apply message
-            //TODO broadcast message
 
-            //this.sendMessage(msgType, parameters);
-            this.model.sendMessageToAll(msgType, parameters);
+            if (this.clientModel.validateMessage(msgType, parameters))
+            {
+                //this.clientModel.onMessage(msgType, parameters);
+                this.model.sendMessageToAll(msgType, parameters);
+            }
+            
+
         }
 
         public void sendMessage(string msgType, params object[] parameters)
         {
-            string msg = SNetUtil.encodeMessage(msgType, parameters);
-            this.netWriter.WriteLine(msg, parameters);
-            log.Debug("send msg- " + msg);
-            
+            //string msg = SNetUtil.encodeMessage(msgType, parameters);
+            //this.netWriter.WriteLine(msg, parameters);
+            //log.Debug("send msg- " + msg);
+            this.clientModel.sendMessage(msgType, parameters);
         }
 
         public void update(GameTime time)

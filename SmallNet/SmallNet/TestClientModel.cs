@@ -7,34 +7,34 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class TestClientModel : ClientModel
+    class TestClientModel : DefaultClientModel
     {
-        protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private int ticks;
-        private string owner;
 
-        public void init(string owner)
+        public override void init()
         {
-            this.owner = owner;
-            this.ticks = 0;
+           // throw new NotImplementedException();
         }
 
-        public void update(GameTime time)
+        public override void update(GameTime time)
         {
-            ticks++;
-            //log.Debug(owner + ": " + ticks);
+            //throw new NotImplementedException();
         }
 
-        public void destroy()
+        public override void destroy()
         {
-            
+            //throw new NotImplementedException();
         }
 
-
-        public string getOwner()
+        public override bool validateMessage(string msgType, params string[] parameters)
         {
-            return this.owner;
+           // throw new NotImplementedException();
+            return true;
+        }
+
+        public override void onMessage(string msgType, params string[] parameters)
+        {
+            //throw new NotImplementedException();
         }
     }
 }

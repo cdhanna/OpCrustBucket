@@ -103,6 +103,12 @@ namespace SmallNet
             return networkIPs;
         }
 
-
+        public T createClientModel<T>(StreamWriter netWriter, string owner) where T : ClientModel 
+        {
+            //create a new client model
+            T clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+            clientModel.create(netWriter, owner);
+            return clientModel;
+        }
     }
 }

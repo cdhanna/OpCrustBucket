@@ -44,6 +44,7 @@
     <Compile Include="BaseHost.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientModel.cs" />
+    <Compile Include="DefaultClientModel.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="SimpleNetTest.cs" />

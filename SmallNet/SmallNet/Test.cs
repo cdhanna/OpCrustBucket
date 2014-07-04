@@ -40,7 +40,7 @@ namespace SmallNet
         {
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1);
 
-            SNetUtil.discoverIps();
+            //SNetUtil.discoverIps();
 
             host.Debug = true;
             host.start();
@@ -71,7 +71,8 @@ namespace SmallNet
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+            client.shutdown();
+            host.shutdown();
         }
 
         /// <summary>
