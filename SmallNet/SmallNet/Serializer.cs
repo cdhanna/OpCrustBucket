@@ -15,6 +15,7 @@ namespace SmallNet
         protected const string HEADBEG = "HEADER BEGINS";
         protected const string HEADEND = "HEADER ENDS";
         protected const string MSGEND = "MESSAGE ENDS";
+        protected const string OBJTYPE = "OBJECT TYPE: ";
         protected const string LHSIDSTR = "LHS = ";
         protected const string RHSIDSTR = "RHS = ";
         protected const string SEPIDSTR = "SEP = ";
@@ -96,6 +97,16 @@ namespace SmallNet
             return str;
             
         }
+        public static Object deserialize(String str)
+        {
+            Type t = getObjType(str);
+            
+            ConstructorInfo c = t.GetConstructor(new Type[] { });
+            Object obj = c.Invoke(new object[] { });
+            //Convert.ChangeType(obj, t);
+            deserialize(str, obj);
+            return obj;
+        }
 
         public static void deserialize(String str, Object obj)
         {
@@ -121,12 +132,22 @@ namespace SmallNet
         {
             string str = "";
             str += HEADBEG
-                + "OBJECT TYPE: " + obj.GetType().ToString()
+                + OBJTYPE + obj.GetType().ToString()
                 + LHSIDSTR + LHS
                 + RHSIDSTR + RHS
                 + SEPIDSTR + SEP 
                 + HEADEND;
             return str;
+        }
+
+        public static Type getObjType(String str)
+        {
+            int beg = str.IndexOf(OBJTYPE) + OBJTYPE.Length;
+            int len = str.IndexOf(LHSIDSTR) - beg;
+            string typeStr = str.Substring(beg, len);
+            Type t = Type.GetType(typeStr);
+            
+            return t;
         }
 
         private static string completeMsg()

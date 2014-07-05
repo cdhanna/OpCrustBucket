@@ -59,8 +59,10 @@
     </Compile>
     <Compile Include="DebugSession\DebugSession.cs" />
     <Compile Include="DefaultClientModel.cs" />
+    <Compile Include="DummyObject.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="LogWatcher.cs" />
+    <Compile Include="Serializer.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="SimpleNetTest.cs" />
