@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmallNet
 {
-    abstract class SMessage
+    public abstract class SMessage
     {
     }
 

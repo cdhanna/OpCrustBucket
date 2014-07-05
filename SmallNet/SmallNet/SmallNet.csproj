@@ -66,7 +66,6 @@
     <Compile Include="Messages\StringMessage.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="Serializer.cs" />
-    <Compile Include="SimpleNetTest.cs" />
     <Compile Include="SMemAppender.cs" />
     <Compile Include="Messages\SMessage.cs" />
     <Compile Include="SNetProp.cs" />

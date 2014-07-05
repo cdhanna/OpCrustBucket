@@ -42,7 +42,7 @@ namespace SmallNet
         {
             
 
-            SMessage smess = Serializer.deserialize(message, new SMessage());
+            SMessage smess = (SMessage)Serializer.deserialize(message);
             //string receivedMsg = message;
             //string[] msg = receivedMsg.Split(' ');
             //string[] param = new string[msg.Length - 1];
