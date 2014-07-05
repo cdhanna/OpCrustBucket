@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class BaseClientProxy<T> where T: ClientModel 
+    public class BaseClientProxy<T> where T: ClientModel 
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -24,8 +24,10 @@ namespace SmallNet
 
         private T clientModel;
 
+       
         public BaseClientProxy(Socket socket, NetModel<T> model)
         {
+
             this.socket = socket;
             Stream socketStream = new NetworkStream(socket);
             this.netReader = new StreamReader(socketStream);
@@ -55,7 +57,7 @@ namespace SmallNet
                     while (loop) //listen forever
                     {
                         string netMessage = netReader.ReadLine();
-                        log.Debug("recieved msg- " + netMessage);
+                        log.Debug(this.clientModel.Owner + " recieved msg- " + netMessage);
                         Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
 
                         if (data.Item1.Equals(SNetProp.DISCONNECT_NOTIFICATION))
@@ -68,8 +70,10 @@ namespace SmallNet
                                 
                             }
                         }
-
+                        log.Debug(this.clientModel.Owner + " going to recieve method");
                         recieveMessage(data.Item1, data.Item2);
+
+                        Thread.Sleep(5);
                     }
                 }
                 catch (Exception e)
@@ -77,6 +81,7 @@ namespace SmallNet
                     log.Debug("client proxy reciever has stopped");
                 }
             });
+            this.recieverThread.Name = "CLIENTPROXY:RECIEVER";
             this.recieverThread.Start();
         }
 
@@ -85,7 +90,7 @@ namespace SmallNet
 
             if (this.clientModel.validateMessage(msgType, parameters))
             {
-                //this.clientModel.onMessage(msgType, parameters);
+                this.clientModel.onMessage(msgType, parameters);
                 this.model.sendMessageToAll(msgType, parameters);
             }
             

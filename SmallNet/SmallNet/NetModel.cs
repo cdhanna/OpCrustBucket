@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class NetModel<T> where T: ClientModel
+    public class NetModel<T> where T: ClientModel
     {
         private List<BaseClientProxy<T>> clients;
 

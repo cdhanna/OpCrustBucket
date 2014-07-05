@@ -7,9 +7,10 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class TestClientModel : DefaultClientModel
+    public class TestClientModel : DefaultClientModel
     {
-
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        
 
         public override void init()
         {
@@ -34,7 +35,7 @@ namespace SmallNet
 
         public override void onMessage(string msgType, params string[] parameters)
         {
-            //throw new NotImplementedException();
+            log.Debug(this.Owner + " : onMessage " + msgType);
         }
     }
 }

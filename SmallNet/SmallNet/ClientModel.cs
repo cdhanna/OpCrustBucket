@@ -7,7 +7,7 @@ using System.IO;
 
 namespace SmallNet
 {
-    interface ClientModel
+    public interface ClientModel
     {
 
         double TargetTime { get; set; }

@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    class BaseClient <T> : Client where T : ClientModel
+    public class BaseClient <T> : Client where T : ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -26,13 +26,17 @@ namespace SmallNet
         private T clientModel;
         private System.Timers.Timer connectTimer;
 
-
+       
+        public Boolean IsRunning { get { return this.connected; } }
         public Boolean Debug { get; set; }
+
+        public event EventHandler Connected;
+
 
         public BaseClient()
         {
             // client initialization
-            this.tcp = new TcpClient();
+            
             this.connected = false;
             this.connectTimer = new System.Timers.Timer(2000);
             this.connectTimer.Elapsed += new System.Timers.ElapsedEventHandler(ConnectTimerTimeOut);
@@ -65,10 +69,12 @@ namespace SmallNet
             //initiate the connection
             try
             {
+                this.tcp = new TcpClient();
                 this.tcp.Connect(hostIpAddress, SNetProp.getPort());
             }
             catch (SocketException e)
             {
+                log.Debug("Client could not establish tcp");
                 return;
             }
 
@@ -98,16 +104,19 @@ namespace SmallNet
                             log.Debug("recieved msg- " + receivedMsg);
                             Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
                             receieveMessage(data.Item1, data.Item2);
+                            Thread.Sleep(5);
                         }
                     }
-                    catch (Exception e)
+                    catch (ThreadAbortException e)
                     {
                         log.Debug("client reciever has stopped");
+                        this.tcp.Close();
                     }
 
                 });
+            this.recieverThread.Name = "BASECLIENT:RECIEVER";
             this.recieverThread.Start();
-            this.connected = true;
+            
 
         }
 
@@ -125,14 +134,27 @@ namespace SmallNet
                 
                 this.sendMessage(SNetProp.DISCONNECT_NOTIFICATION);
                 this.recieverThread.Abort();
-                this.tcp.Close();
                 this.connected = false;
+                
                 log.Debug("disconnect");
             }
-            catch (Exception e)
+            catch (ThreadAbortException e)
             {
                 log.Debug("disconnect did not finish");
             }
+            
+            this.fireConnected();
+        }
+
+        private void fireConnected()
+        {
+
+            var handler = Connected;
+            if (handler != null)
+            {
+                handler(this, new EventArgs());
+            }
+
         }
 
         public void receieveMessage(string msgType, params string[] paramterStrings)
@@ -142,6 +164,9 @@ namespace SmallNet
                 //create a new client model
                 this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
                 this.clientModel.create(this.netWriter, "client");
+                this.connected = true;
+
+                this.fireConnected();
             }
             else
             {
@@ -152,16 +177,17 @@ namespace SmallNet
         public void sendMessage(string msgType, params object[] parameters)
         {
             //construct a message
-            if (this.clientModel == null) // this is only true on the first case
+            if (!this.connected) // this is only true on the first case
             {
                 String msg = SNetUtil.encodeMessage(msgType, parameters);
                 this.netWriter.WriteLine(msg, parameters);
+                log.Debug("sent connection message");
             }
             else
             {
                 //log.Debug("send msg- " + msg);
                 this.clientModel.sendMessage(msgType, parameters);
-
+                log.Debug("sent regular message");
             }
         }
         public void shutdown()

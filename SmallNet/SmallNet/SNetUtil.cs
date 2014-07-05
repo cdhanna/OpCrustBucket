@@ -96,7 +96,7 @@ namespace SmallNet
                     line = line.Substring(0, "123.123.123.123  ".Length);
                     line = line.Replace(" ", "");
                     networkIPs.Add(line);
-                    Console.WriteLine(line);
+                  //  Console.WriteLine(line);
                 }
             }
             p.WaitForExit();

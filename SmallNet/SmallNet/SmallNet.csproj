@@ -44,10 +44,26 @@
     <Compile Include="BaseHost.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientModel.cs" />
+    <Compile Include="DebugSession\Command_ConnectTo.cs" />
+    <Compile Include="DebugSession\Command_Disconnect.cs" />
+    <Compile Include="DebugSession\Command_GetAllIP.cs" />
+    <Compile Include="DebugSession\Command_SendMsg.cs" />
+    <Compile Include="DebugSession\Command_StartHost.cs" />
+    <Compile Include="DebugSession\CommandOption.cs" />
+    <Compile Include="DebugSession\Command_StopHost.cs" />
+    <Compile Include="DebugSession\DebugForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugSession\DebugForm.Designer.cs">
+      <DependentUpon>DebugForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugSession\DebugSession.cs" />
     <Compile Include="DefaultClientModel.cs" />
     <Compile Include="Host.cs" />
+    <Compile Include="LogWatcher.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="SimpleNetTest.cs" />
+    <Compile Include="SMemAppender.cs" />
     <Compile Include="SNetProp.cs" />
     <Compile Include="SNetUtil.cs" />
     <Compile Include="Test.cs" />
@@ -68,6 +84,9 @@
     <Reference Include="Lidgren.Network">
       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsGL\Lidgren.Network.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="Tao.Sdl">
       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsGL\Tao.Sdl.dll</HintPath>
     </Reference>
@@ -83,6 +102,11 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DebugSession\DebugForm.resx">
+      <DependentUpon>DebugForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

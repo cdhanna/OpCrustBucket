@@ -18,10 +18,10 @@ namespace SmallNet
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
-        BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
+        //BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
+        //BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
 
-
+        DebugSession.DebugSession<TestClientModel> debug;
 
         public Test()
             : base()
@@ -42,13 +42,22 @@ namespace SmallNet
 
             //SNetUtil.discoverIps();
 
-            host.Debug = true;
-            host.start();
+            //host.Debug = true;
+            //host.start();
 
-            client.Debug = true;
-            client.connectTo(SNetUtil.getLocalIp(), "WillTest");
+            //client.Debug = true;
+            //client.connectTo(SNetUtil.getLocalIp(), "WillTest");
 
-            Console.WriteLine("init");
+
+            //System.Threading.Thread.Sleep(100);
+            //client.sendMessage("test", "1");
+
+            //Console.WriteLine("init");
+
+            debug = new DebugSession.DebugSession<TestClientModel>();
+
+            debug.start();
+
 
             base.Initialize();
         }
@@ -71,8 +80,9 @@ namespace SmallNet
         /// </summary>
         protected override void UnloadContent()
         {
-            client.shutdown();
-            host.shutdown();
+            //client.shutdown();
+            //host.shutdown();
+            debug.stop();
         }
 
         /// <summary>
@@ -84,10 +94,10 @@ namespace SmallNet
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            
-            client.update(gameTime);
-            host.update(gameTime);
 
+            //client.update(gameTime);
+            //host.update(gameTime);
+           
             base.Update(gameTime);
         }
 

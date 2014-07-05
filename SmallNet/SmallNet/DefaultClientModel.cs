@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace SmallNet
 {
-    abstract class DefaultClientModel : ClientModel
+    public abstract class DefaultClientModel : ClientModel
     {
         protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -60,11 +60,12 @@ namespace SmallNet
         public virtual void sendMessage(string msgType, params object[] parameters)
         {
             //construct a message
-            string msg = SNetUtil.encodeMessage(msgType, parameters);
+            String msg = SNetUtil.encodeMessage(msgType, parameters);
 
             //send the message
             this.netWriter.WriteLine(msg, parameters);
-            log.Debug("send msg- " + msg);
+
+            log.Debug( this.Owner + " send msg- " + msg);
         }
 
         public void keepTime()

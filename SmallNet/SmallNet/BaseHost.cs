@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SmallNet
 {
    
-    class BaseHost<T> : Host where T:ClientModel
+    public class BaseHost<T> : Host where T:ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -25,6 +25,10 @@ namespace SmallNet
         public string IpAddress { get { return this.ipAddress; } }
 
         public NetModel<T> Model { get { return this.model; } }
+        private bool isRunning;
+        public bool IsRunning { get { return this.isRunning; } }
+
+        public event EventHandler Connected;
 
         public BaseHost()
         {
@@ -32,6 +36,12 @@ namespace SmallNet
            
             this.ipAddress = SNetUtil.getLocalIp();
             this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
+
+        }
+
+        public void start()
+        {
+
             this.clientAcceptorThread = new Thread(() =>
             {
                 log.Debug("client acceptor thread is starting...");
@@ -54,13 +64,22 @@ namespace SmallNet
                     log.Debug("client acceptor thread has stopped... " + e.Message);
                 }
             });
-        }
 
-        public void start()
-        {
             this.clientAcceptorThreadRunner = true;
             this.tcpListener.Start();
+            this.clientAcceptorThread.Name = "HOST:CLIENTACCEPTER";
             this.clientAcceptorThread.Start();
+            isRunning = true;
+            this.fireConnectedEvent();
+
+        }
+
+        private void fireConnectedEvent(){
+            var handler = Connected;
+            if (handler != null)
+            {
+                handler(this, new EventArgs());
+            }
         }
 
         public void shutdown()
@@ -72,10 +91,14 @@ namespace SmallNet
                 this.clientAcceptorThread.Abort();
 
                 log.Debug("host shutdown");
+
+                this.isRunning = false;
+                this.fireConnectedEvent();
             }
             catch (Exception e)
             {
             }
+            
         }
 
         public void sendMessageToAll(string msgType, params object[] parameters)
