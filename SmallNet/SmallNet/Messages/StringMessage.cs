@@ -17,7 +17,10 @@ namespace SmallNet.Messages
 
         public String Message { get { return this.msg; } }
 
-
+        public override string ToString()
+        {
+            return this.msg;
+        }
 
     }
 }
