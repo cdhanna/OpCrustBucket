@@ -7,11 +7,13 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.IO;
+using log4net;
 
 namespace SmallNet
 {
     class Serializer
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected const string HEADBEG = "HEADER BEGINS";
         protected const string HEADEND = "HEADER ENDS";
         protected const string MSGEND = "MESSAGE ENDS";
@@ -226,13 +228,13 @@ namespace SmallNet
                     default:
                         {
                             int x = fieldList.IndexOf(name);
-
                             if (x != -1)
                             {
                                 FieldInfo f = fields[x];
                                 if (f.Name.Equals(name))
                                 {
-                                    Type t = f.GetValue(obj).GetType();
+
+                                    Type t = f.FieldType;// f.GetValue(obj).GetType(); 
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
                                         string val = pieces[index+2];
@@ -240,11 +242,13 @@ namespace SmallNet
                                         f.SetValue(obj, Convert.ChangeType(val, t));
                                         break;
                                     }
+                                    
                                     else
                                     {
                                         str = str.Substring(str.IndexOf(left));
                                         writeVal(str, f.GetValue(obj), left, right, delim);
                                     }
+                                    
                                 }
                             }
                             break;

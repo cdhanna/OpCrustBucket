@@ -7,12 +7,17 @@ namespace SmallNet
 {
     class DummyObject
     {
-        protected int x = 4;
-        protected string words = "hello world";
+        protected int x;
+        protected string words;
 
         public DummyObject()
         {
+            int x = 4;
+        }
 
+        public void setString(string str)
+        {
+            this.words = str;
         }
     }
 }
