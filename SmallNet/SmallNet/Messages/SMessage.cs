@@ -7,6 +7,7 @@ namespace SmallNet
 {
     public abstract class SMessage
     {
+
     }
 
     

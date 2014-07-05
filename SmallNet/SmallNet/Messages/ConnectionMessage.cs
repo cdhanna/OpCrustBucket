@@ -15,6 +15,9 @@ namespace SmallNet.Messages
             this.credentials = credentials;
         }
 
+        public ConnectionMessage() : base() { }
+
+
         public String Credentials { get { return this.credentials; } }
 
     }

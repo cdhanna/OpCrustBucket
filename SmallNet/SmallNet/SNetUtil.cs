@@ -12,6 +12,10 @@ namespace SmallNet
 {
     class SNetUtil
     {
+
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+
         /// <summary>
         /// Encode a message type with parameters.
         /// the final encored message will look like this
@@ -30,6 +34,7 @@ namespace SmallNet
             //{
             //    msg += "{" + i + "} ";
             //}
+            log.Debug("ENCODING MESSAGE : " + smessage.ToString());
             string msg = Serializer.serialize(smessage);
             return msg;
         }
@@ -43,8 +48,8 @@ namespace SmallNet
         /// <returns></returns>
         public static SMessage decodeMessage(string message)
         {
-            
 
+            log.Debug("DECODING MESSAGE : " + message);
             SMessage smess = (SMessage)Serializer.deserialize(message);
             //string receivedMsg = message;
             //string[] msg = receivedMsg.Split(' ');

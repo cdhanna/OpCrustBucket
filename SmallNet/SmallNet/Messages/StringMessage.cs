@@ -13,6 +13,8 @@ namespace SmallNet.Messages
         {
             this.msg = msg;
         }
+        public StringMessage() : base() { }
+
         public String Message { get { return this.msg; } }
     }
 }
