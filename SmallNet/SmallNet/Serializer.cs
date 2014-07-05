@@ -103,7 +103,6 @@ namespace SmallNet
             
             ConstructorInfo c = t.GetConstructor(new Type[] { });
             Object obj = c.Invoke(new object[] { });
-            //Convert.ChangeType(obj, t);
             deserialize(str, obj);
             return obj;
         }
@@ -121,9 +120,11 @@ namespace SmallNet
             delim = header.Substring(s, 1); //CHANGE the 1
 
             string body = str.Substring(str.IndexOf(HEADEND) + HEADEND.Length);
-            body = body.Substring(0, body.Length - MSGEND.Length);
-            writeVal(body, obj,left,right,delim);
-            
+            if (body.Length != MSGEND.Length)
+            {
+                body = body.Substring(0, body.Length - MSGEND.Length);
+                writeVal(body, obj, left, right, delim);
+            }
         }
 
 
