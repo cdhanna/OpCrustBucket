@@ -7,6 +7,6 @@ namespace SmallNet.Messages
 {
     class CreateNewModelMessage : SMessage
     {
-        public CreateNewModelMessage() { }
+        public CreateNewModelMessage() : base(){ }
     }
 }

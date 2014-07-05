@@ -79,7 +79,9 @@ namespace SmallNet
                 }
                 catch (Exception e)
                 {
-                    log.Debug("client proxy reciever has stopped");
+                    throw e;
+                    //log.Debug("client proxy reciever has stopped:: " + e.StackTrace);
+                    //log.Debug("ERROR: " + e.);
                 }
             });
             this.recieverThread.Name = "CLIENTPROXY:RECIEVER";
