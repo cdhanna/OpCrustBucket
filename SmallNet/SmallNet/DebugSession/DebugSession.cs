@@ -22,10 +22,11 @@ namespace SmallNet.DebugSession
 
         private BaseHost<T> host;
         public BaseHost<T> Host { get { return this.host; } set { this.host = value; } }
+        private bool hostListener;
 
         private BaseClient<T> client;
         public BaseClient<T> Client { get { return this.client; } set { this.client = value; } }
-
+        private bool clientListener;
 
         private Thread commandThread;
         private Queue<CommandParameter> commandQueue;
@@ -83,7 +84,39 @@ namespace SmallNet.DebugSession
                     if (commandQueue.Count > 0)
                     {
                         CommandParameter cp = this.commandQueue.Dequeue();
-                        cp.command.runCommand(this, cp.paramString);
+                        df.appendOutput(cp.command.runCommand(this, cp.paramString));
+
+
+                        if (Host != null && !this.hostListener)
+                        {
+                            this.hostListener = true;
+                            Host.Connected += (sender2, args) =>
+                            {
+                                df.setHostOnBox(Host.IsRunning);
+                            };
+                            df.setHostOnBox(Host.IsRunning);
+                        }
+                        if (Client != null && !this.clientListener)
+                        {
+                            this.clientListener = true;
+                            Client.Connected += (sender2, args) =>
+                                {
+                                    df.setClientOnBox(Client.IsRunning);
+                            
+                                };
+                            Client.NewModel += (sender2, args) =>
+                                {
+                                    Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
+                                        {
+                                            df.appendOutput("MSG: " + mArgs.getMsgType() + Environment.NewLine);
+                                        };
+                                };
+
+  
+
+                           df.setClientOnBox(Client.IsRunning);
+                        }
+
                     }
                     Thread.Sleep(10);
                 }

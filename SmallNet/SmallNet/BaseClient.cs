@@ -26,12 +26,13 @@ namespace SmallNet
         private T clientModel;
         private System.Timers.Timer connectTimer;
 
-       
+        public T ClientModel { get { return this.clientModel; } set { this.clientModel = value; } }
         public Boolean IsRunning { get { return this.connected; } }
         public Boolean Debug { get; set; }
 
         public event EventHandler Connected;
-
+        public event EventHandler NewModel;
+        //public event EventHandler<MessageEventArgs> RecievedMessage;
 
         public BaseClient()
         {
@@ -48,7 +49,7 @@ namespace SmallNet
             this.tcp.Close();
         }
 
-
+       
 
         /// <summary>
         /// attempt to connect a server at the ipaddress
@@ -148,13 +149,19 @@ namespace SmallNet
 
         private void fireConnected()
         {
-
             var handler = Connected;
             if (handler != null)
             {
                 handler(this, new EventArgs());
             }
-
+        }
+        private void fireMessageRecieved(String msg, String[] p)
+        {
+            //var handler = receieveMessage;
+            //if (handler != null)
+            {
+               // receieveMessage(this, new MessageEventArgs(msg, p));
+            }
         }
 
         public void receieveMessage(string msgType, params string[] paramterStrings)
@@ -164,12 +171,18 @@ namespace SmallNet
                 //create a new client model
                 this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
                 this.clientModel.create(this.netWriter, "client");
+                //this.clientModel.MessageRecieved += (sender, args) => { };
+                if (NewModel != null)
+                {
+                    NewModel(this, new EventArgs());
+                }
                 this.connected = true;
 
                 this.fireConnected();
             }
             else
             {
+                
                 this.clientModel.onMessage(msgType, paramterStrings); // no need to validate it here, because it has already been validated server side.
             }
         }

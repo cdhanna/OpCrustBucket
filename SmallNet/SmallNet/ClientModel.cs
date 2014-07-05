@@ -13,6 +13,8 @@ namespace SmallNet
         double TargetTime { get; set; }
         string Owner { get; }
 
+        EventHandler<MessageEventArgs> MessageRecieved { get; set; }
+
         void create(StreamWriter netWriter, string owner);
         void init();
         void keepTime();

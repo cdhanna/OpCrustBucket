@@ -32,7 +32,7 @@ namespace SmallNet.DebugSession
                 for (int i = 0 ; i < args.Length ; i ++){
                     args[i] = paramString[i+1];
                 }
-                debug.Client.sendMessage("abc", "1");
+                debug.Client.sendMessage(paramString[0], args);
                 return "Sent message";
             }
         }

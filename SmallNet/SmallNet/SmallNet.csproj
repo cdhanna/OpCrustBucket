@@ -61,6 +61,7 @@
     <Compile Include="DefaultClientModel.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="LogWatcher.cs" />
+    <Compile Include="MessageEventArgs.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="SimpleNetTest.cs" />
     <Compile Include="SMemAppender.cs" />

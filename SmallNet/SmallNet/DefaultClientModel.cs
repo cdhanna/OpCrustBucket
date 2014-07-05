@@ -20,6 +20,10 @@ namespace SmallNet
         private System.Timers.Timer timer;
         private StreamWriter netWriter;
 
+
+        private EventHandler<MessageEventArgs> messageRecieved;
+        public EventHandler<MessageEventArgs> MessageRecieved { get { return this.messageRecieved; } set { this.messageRecieved = value; } }
+
         public DefaultClientModel()
         {
             this.timer = new System.Timers.Timer();
@@ -53,7 +57,13 @@ namespace SmallNet
         public abstract void destroy();
 
         public abstract bool validateMessage(string msgType, params string[] parameters);
-        public abstract void onMessage(string msgType, params string[] parameters);
+        public virtual void onMessage(string msgType, params string[] parameters)
+        {
+            if (messageRecieved != null)
+            {
+                MessageRecieved(this, new MessageEventArgs(msgType, parameters));
+            }
+        }
 
 
 

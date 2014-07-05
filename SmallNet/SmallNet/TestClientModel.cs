@@ -36,6 +36,7 @@ namespace SmallNet
         public override void onMessage(string msgType, params string[] parameters)
         {
             log.Debug(this.Owner + " : onMessage " + msgType);
+            base.onMessage(msgType, parameters);
         }
     }
 }

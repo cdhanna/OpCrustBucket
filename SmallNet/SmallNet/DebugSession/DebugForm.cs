@@ -50,14 +50,29 @@ namespace SmallNet.DebugSession
             
         }
 
+        public void appendOutput(string output)
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.consoleBox.AppendText((lineCount++) + ": " + output + Environment.NewLine);
+            });
+        }
+
         public void setClientOnBox(bool client)
         {
-            this.clientOn.Checked = client;
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.clientOn.Checked = client;
+            });
         }
 
         public void setHostOnBox(bool host)
         {
-            this.serverOn.Checked = host;
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.serverOn.Checked = host;
+            });
+            
         }
 
         public void addCommandOption(CommandOption<T> command)
@@ -75,30 +90,13 @@ namespace SmallNet.DebugSession
                 
                 CommandOption<T> c = (CommandOption<T>)this.commandOptionsBox.SelectedItem;
                 debug.runCommand(c, this.paramBox.Text.Split(' '));
+                
                 //String output = c.runCommand(this.debug, this.paramBox.Text.Split(' '));
                 //this.consoleBox.AppendText((lineCount++) + ": [" + c.getName() + "] => " + output + Environment.NewLine);
 
                 //this.parameterTable[c] = this.paramBox.Text;
 
-                if (this.debug.Host != null)
-                {
-                    this.debug.Host.Connected += (sender2, args) =>
-                    {
-                        setHostOnBox(debug.Host.IsRunning);
-                    };
-                    setHostOnBox(debug.Host.IsRunning);
-                }
-                if (this.debug.Client != null)
-                {
-                    this.debug.Client.Connected += (sender2, args) =>
-                    {
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            setClientOnBox(debug.Client == null ? false : debug.Client.IsRunning);
-                        });
-                    };
-                    setClientOnBox(debug.Client == null ? false : debug.Client.IsRunning);
-                }
+
             });
         }
 
