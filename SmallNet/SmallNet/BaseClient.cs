@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    public class BaseClient <T> : Client where T : ClientModel
+    public class BaseClient <T> where T : ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -88,7 +88,7 @@ namespace SmallNet
 
             this.netWriter.AutoFlush = true;
 
-            this.sendMessage(SNetProp.CREDENTIALS, credentials);
+            this.sendMessage(new Messages.ConnectionMessage(credentials));
 
             if (this.recieverThread != null)
             {
@@ -103,8 +103,9 @@ namespace SmallNet
                             //decode incoming messages, and pass them to the recievedMessage()
                             string receivedMsg = netReader.ReadLine();
                             log.Debug("recieved msg- " + receivedMsg);
-                            Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
-                            receieveMessage(data.Item1, data.Item2);
+                           // Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
+                            SMessage message = SNetUtil.decodeMessage(receivedMsg);
+                            receieveMessage(message);
                             Thread.Sleep(5);
                         }
                     }
@@ -133,7 +134,7 @@ namespace SmallNet
             {
                 this.clientModel.destroy();
                 
-                this.sendMessage(SNetProp.DISCONNECT_NOTIFICATION);
+                this.sendMessage(new Messages.DisconnectionMessage());
                 this.recieverThread.Abort();
                 this.connected = false;
                 
@@ -164,9 +165,9 @@ namespace SmallNet
             }
         }
 
-        public void receieveMessage(string msgType, params string[] paramterStrings)
+        public void receieveMessage(SMessage message)
         {
-            if (msgType.Equals(SNetProp.CREATE_NEW_CLIENT_MODEL))
+            if (message is Messages.CreateNewModelMessage)
             {
                 //create a new client model
                 this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -183,23 +184,23 @@ namespace SmallNet
             else
             {
                 
-                this.clientModel.onMessage(msgType, paramterStrings); // no need to validate it here, because it has already been validated server side.
+                this.clientModel.onMessage(message); // no need to validate it here, because it has already been validated server side.
             }
         }
 
-        public void sendMessage(string msgType, params object[] parameters)
+        public void sendMessage(SMessage message)
         {
             //construct a message
             if (!this.connected) // this is only true on the first case
             {
-                String msg = SNetUtil.encodeMessage(msgType, parameters);
-                this.netWriter.WriteLine(msg, parameters);
+                String msg = SNetUtil.encodeMessage(message);
+                this.netWriter.WriteLine(msg);
                 log.Debug("sent connection message");
             }
             else
             {
                 //log.Debug("send msg- " + msg);
-                this.clientModel.sendMessage(msgType, parameters);
+                this.clientModel.sendMessage(message);
                 log.Debug("sent regular message");
             }
         }

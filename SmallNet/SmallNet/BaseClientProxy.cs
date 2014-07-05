@@ -58,9 +58,10 @@ namespace SmallNet
                     {
                         string netMessage = netReader.ReadLine();
                         log.Debug(this.clientModel.Owner + " recieved msg- " + netMessage);
-                        Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
-
-                        if (data.Item1.Equals(SNetProp.DISCONNECT_NOTIFICATION))
+                        //Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
+                        SMessage smessage = SNetUtil.decodeMessage(netMessage);
+                        //if (data.Item1.Equals(SNetProp.DISCONNECT_NOTIFICATION))
+                        if (smessage is Messages.DisconnectionMessage)
                         {
                             loop = false;
                             removeFromModel();
@@ -71,7 +72,7 @@ namespace SmallNet
                             }
                         }
                         log.Debug(this.clientModel.Owner + " going to recieve method");
-                        recieveMessage(data.Item1, data.Item2);
+                        recieveMessage(smessage);
 
                         Thread.Sleep(5);
                     }
@@ -85,24 +86,24 @@ namespace SmallNet
             this.recieverThread.Start();
         }
 
-        protected void recieveMessage(string msgType , params string[] parameters)
+        protected void recieveMessage(SMessage message)
         {
 
-            if (this.clientModel.validateMessage(msgType, parameters))
+            if (this.clientModel.validateMessage(message))
             {
-                this.clientModel.onMessage(msgType, parameters);
-                this.model.sendMessageToAll(msgType, parameters);
+                this.clientModel.onMessage(message);
+                this.model.sendMessageToAll(message);
             }
             
 
         }
 
-        public void sendMessage(string msgType, params object[] parameters)
+        public void sendMessage(SMessage message)
         {
             //string msg = SNetUtil.encodeMessage(msgType, parameters);
             //this.netWriter.WriteLine(msg, parameters);
             //log.Debug("send msg- " + msg);
-            this.clientModel.sendMessage(msgType, parameters);
+            this.clientModel.sendMessage(message);
         }
 
         public void update(GameTime time)

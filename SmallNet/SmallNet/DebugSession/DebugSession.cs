@@ -108,7 +108,7 @@ namespace SmallNet.DebugSession
                                 {
                                     Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
                                         {
-                                            df.appendOutput("MSG: " + mArgs.getMsgType() + Environment.NewLine);
+                                            df.appendOutput("MSG: " + mArgs.getMessage() + Environment.NewLine);
                                         };
                                 };
 

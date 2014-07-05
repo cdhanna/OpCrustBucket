@@ -7,21 +7,15 @@ namespace SmallNet
 {
     public class MessageEventArgs : EventArgs
     {
-        private String msgType;
-        private String[] parameters;
-        public MessageEventArgs(String msgType, String[] parameters)
+        private SMessage message;
+        public MessageEventArgs(SMessage message)
             : base()
         {
-            this.msgType = msgType;
-            this.parameters = parameters;
+            this.message = message;
         }
-        public String getMsgType()
+        public SMessage getMessage()
         {
-            return this.msgType;
-        }
-        public String[] getParameters()
-        {
-            return this.parameters;
+            return this.message;
         }
     }
 }

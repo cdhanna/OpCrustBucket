@@ -56,24 +56,24 @@ namespace SmallNet
 
         public abstract void destroy();
 
-        public abstract bool validateMessage(string msgType, params string[] parameters);
-        public virtual void onMessage(string msgType, params string[] parameters)
+        public abstract bool validateMessage(SMessage message);
+        public virtual void onMessage(SMessage message)
         {
             if (messageRecieved != null)
             {
-                MessageRecieved(this, new MessageEventArgs(msgType, parameters));
+                MessageRecieved(this, new MessageEventArgs(message));
             }
         }
 
 
 
-        public virtual void sendMessage(string msgType, params object[] parameters)
+        public virtual void sendMessage(SMessage message)
         {
             //construct a message
-            String msg = SNetUtil.encodeMessage(msgType, parameters);
+            String msg = SNetUtil.encodeMessage(message);
 
             //send the message
-            this.netWriter.WriteLine(msg, parameters);
+            this.netWriter.WriteLine(msg);
 
             log.Debug( this.Owner + " send msg- " + msg);
         }
