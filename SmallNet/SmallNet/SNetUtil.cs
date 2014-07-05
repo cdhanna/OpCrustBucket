@@ -5,6 +5,9 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Net;
+
+using log4net;[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+
 namespace SmallNet
 {
     class SNetUtil
