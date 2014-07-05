@@ -115,6 +115,11 @@ namespace SmallNet
             return networkIPs;
         }
 
+        public static long getCurrentTime()
+        {
+            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+        }
+
         public T createClientModel<T>(StreamWriter netWriter, string owner) where T : ClientModel 
         {
             //create a new client model
