@@ -21,9 +21,9 @@ namespace SmallNet
         void update(GameTime time);
         void destroy();
 
-        bool validateMessage(string msgType, params string[] parameters);
-        void onMessage(string msgType, params string[] parameters);
-        void sendMessage(string msgType, params object[] parameters);
+        bool validateMessage(SMessage message);
+        void onMessage(SMessage message);
+        void sendMessage(SMessage message);
 
     }
 }

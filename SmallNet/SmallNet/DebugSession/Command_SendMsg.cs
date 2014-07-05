@@ -28,11 +28,10 @@ namespace SmallNet.DebugSession
                 if (paramString.Length == 0){
                     return "Cannot send empty message";
                 }
-                string[] args = new string[paramString.Length-1];
-                for (int i = 0 ; i < args.Length ; i ++){
-                    args[i] = paramString[i+1];
-                }
-                debug.Client.sendMessage(paramString[0], args);
+                string msg = "";
+                foreach (string m in paramString)
+                    msg += m + " ";
+                debug.Client.sendMessage(new Messages.StringMessage(paramString[0]));
                 return "Sent message";
             }
         }

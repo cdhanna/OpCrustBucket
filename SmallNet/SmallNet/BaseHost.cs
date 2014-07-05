@@ -11,10 +11,11 @@ using Microsoft.Xna.Framework;
 namespace SmallNet
 {
    
-    public class BaseHost<T> : Host where T:ClientModel
+    public class BaseHost<T> where T:ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
+
         private TcpListener tcpListener;
         private string ipAddress;
         private Thread clientAcceptorThread;
@@ -53,7 +54,7 @@ namespace SmallNet
                         Socket socket = tcpListener.AcceptSocket();
                         //create clientProxy, which puts it into the model
                         BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model);
-                        client.sendMessage(SNetProp.CREATE_NEW_CLIENT_MODEL);
+                        client.sendMessage(new Messages.CreateNewModelMessage());
                         client.Debug = Debug;
                         log.Debug("got a connection");
                         this.model.addClient(client);
@@ -101,9 +102,9 @@ namespace SmallNet
             
         }
 
-        public void sendMessageToAll(string msgType, params object[] parameters)
+        public void sendMessageToAll(SMessage message)
         {
-            this.model.sendMessageToAll(msgType, parameters);
+            this.model.sendMessageToAll(message);
         }
 
         public void update(GameTime time)

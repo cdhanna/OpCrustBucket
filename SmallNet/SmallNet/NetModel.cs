@@ -30,11 +30,11 @@ namespace SmallNet
             this.clients.Remove(client);
         }
 
-        public void sendMessageToAll(string msgType, params object[] parameters)
+        public void sendMessageToAll(SMessage message)
         {
             foreach (BaseClientProxy<T> proxy in this.clients)
             {
-                proxy.sendMessage(msgType, parameters);
+                proxy.sendMessage(message);
             }
         }
 

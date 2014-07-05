@@ -20,13 +20,14 @@ namespace SmallNet
         /// <param name="msgType"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static string encodeMessage(string msgType, params object[] parameters)
+        public static string encodeMessage(SMessage smessage)
         {
-            string msg = msgType + " ";
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                msg += "{" + i + "} ";
-            }
+            //string msg = msgType + " ";
+            //for (int i = 0; i < parameters.Length; i++)
+            //{
+            //    msg += "{" + i + "} ";
+            //}
+            string msg = Serializer.serialize(smessage);
             return msg;
         }
 
@@ -37,18 +38,21 @@ namespace SmallNet
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static Tuple<string, string[]> decodeMessage(string message)
+        public static SMessage decodeMessage(string message)
         {
-            string receivedMsg = message;
-            string[] msg = receivedMsg.Split(' ');
-            string[] param = new string[msg.Length - 1];
-            for (int i = 0; i < msg.Length - 1; i++)
-            {
-                param[i] = msg[i + 1];
-            }
             
-            Tuple<string, string[]> retValue = new Tuple<string, string[]>(msg[0], param);
-            return retValue;
+
+            SMessage smess = Serializer.deserialize(message, new SMessage());
+            //string receivedMsg = message;
+            //string[] msg = receivedMsg.Split(' ');
+            //string[] param = new string[msg.Length - 1];
+            //for (int i = 0; i < msg.Length - 1; i++)
+            //{
+            //    param[i] = msg[i + 1];
+            //}
+            
+            //Tuple<string, string[]> retValue = new Tuple<string, string[]>(msg[0], param);
+            return smess;
         }
 
         /// <summary>

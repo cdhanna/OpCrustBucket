@@ -27,16 +27,16 @@ namespace SmallNet
             //throw new NotImplementedException();
         }
 
-        public override bool validateMessage(string msgType, params string[] parameters)
+        public override bool validateMessage(SMessage message)
         {
            // throw new NotImplementedException();
             return true;
         }
 
-        public override void onMessage(string msgType, params string[] parameters)
+        public override void onMessage(SMessage message)
         {
-            log.Debug(this.Owner + " : onMessage " + msgType);
-            base.onMessage(msgType, parameters);
+            log.Debug(this.Owner + " : onMessage " + message);
+            base.onMessage(message);
         }
     }
 }
