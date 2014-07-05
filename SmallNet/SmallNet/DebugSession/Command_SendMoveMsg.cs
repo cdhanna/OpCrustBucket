@@ -5,13 +5,12 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_SendMsg<T> : CommandOption<T> where T : ClientModel
+    class Command_SendMoveMsg<T> : CommandOption<T> where T : ClientModel
     {
-        public Command_SendMsg()
-            : base("Send Message")
+        public Command_SendMoveMsg()
+            : base("Sent Move Message")
         {
         }
-
 
         public override string runCommand(DebugSession<T> debug, string[] paramString)
         {
@@ -28,17 +27,15 @@ namespace SmallNet.DebugSession
                 if (paramString.Length == 0){
                     return "Cannot send empty message";
                 }
-                string msg = "";
-                foreach (string m in paramString)
-                    msg += m + " ";
-                debug.Client.sendMessage(new Messages.StringMessage(msg));
+                
+                debug.Client.sendMessage(new Messages.MoveMessage(int.Parse(paramString[0]), int.Parse(paramString[1])));
                 return "Sent message";
             }
         }
 
         public override string getParamDescription()
         {
-            return "give parameters in the following format. <msgType> <arg1> <arg2> <arg...> <argn>";
+            return "Give parameters in the following format; <X> <Y>";
         }
     }
 }

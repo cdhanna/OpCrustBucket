@@ -37,12 +37,14 @@ namespace SmallNet.DebugSession
             logWatcher.Updated += logWatcher_Updated;
 
             this.df = new DebugForm<T>(this);
+            this.df.addCommandOption(new Command_HostAndClient<T>());
             this.df.addCommandOption(new Command_GetAllIP<T>());
             this.df.addCommandOption(new Command_StartHost<T>());
             this.df.addCommandOption(new Command_StopHost<T>());
             this.df.addCommandOption(new Command_ConnectTo<T>());
             this.df.addCommandOption(new Command_Disconnect<T>());
             this.df.addCommandOption(new Command_SendMsg<T>());
+            this.df.addCommandOption(new Command_SendMoveMsg<T>());
 
 
             this.formThread = new Thread(() =>
