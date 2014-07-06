@@ -19,7 +19,7 @@ namespace SmallNet
         private string name;
         private System.Timers.Timer timer;
         private StreamWriter netWriter;
-
+        private int id;
 
         private EventHandler<MessageEventArgs> messageRecieved;
         public EventHandler<MessageEventArgs> MessageRecieved { get { return this.messageRecieved; } set { this.messageRecieved = value; } }
@@ -35,7 +35,7 @@ namespace SmallNet
             set;
         }
         public string Owner { get{ return this.name;} }
-
+        public int Id { get { return this.id; } }
         public void create(StreamWriter netWriter, string owner)
         {
             this.TargetTime = 30;
@@ -48,6 +48,11 @@ namespace SmallNet
 
 
             this.init();
+        }
+
+        public void setId(int id)
+        {
+            this.id = id;
         }
 
         public abstract void init();

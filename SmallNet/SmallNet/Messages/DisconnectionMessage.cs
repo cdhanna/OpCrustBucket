@@ -7,6 +7,7 @@ namespace SmallNet.Messages
 {
     class DisconnectionMessage : SMessage
     {
-        public DisconnectionMessage() { }
+        public DisconnectionMessage() : base() { }
+        public DisconnectionMessage(Id id) : base (id) { }
     }
 }

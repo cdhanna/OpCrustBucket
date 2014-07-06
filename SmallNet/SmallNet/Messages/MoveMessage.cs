@@ -14,8 +14,8 @@ namespace SmallNet.Messages
         {
         }
 
-        public MoveMessage(int x, int y)
-            : base()
+        public MoveMessage(Id id, int x, int y)
+            : base(id)
         {
             this.x = x;
             this.y = y;

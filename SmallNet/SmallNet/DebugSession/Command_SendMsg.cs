@@ -31,7 +31,7 @@ namespace SmallNet.DebugSession
                 string msg = "";
                 foreach (string m in paramString)
                     msg += m + " ";
-                debug.Client.sendMessage(new Messages.StringMessage(msg));
+                debug.Client.sendMessage(new Messages.StringMessage(debug.Client, msg));
                 return "Sent message";
             }
         }

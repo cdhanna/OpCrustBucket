@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    public class BaseClient <T> where T : ClientModel
+    public class BaseClient <T> : Id where T : ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -32,7 +32,9 @@ namespace SmallNet
 
         public event EventHandler Connected;
         public event EventHandler NewModel;
-        //public event EventHandler<MessageEventArgs> RecievedMessage;
+
+        int id;
+        public int Id { get { return this.id; } }
 
         public BaseClient()
         {
@@ -88,7 +90,7 @@ namespace SmallNet
 
             this.netWriter.AutoFlush = true;
 
-            this.sendMessage(new Messages.ConnectionMessage(credentials));
+            this.sendMessage(new Messages.ConnectionMessage(this, credentials));
 
             if (this.recieverThread != null)
             {
@@ -134,7 +136,7 @@ namespace SmallNet
             {
                 this.clientModel.destroy();
                 
-                this.sendMessage(new Messages.DisconnectionMessage());
+                this.sendMessage(new Messages.DisconnectionMessage(this));
                 this.recieverThread.Abort();
                 this.connected = false;
                 
@@ -170,9 +172,11 @@ namespace SmallNet
             if (message is Messages.CreateNewModelMessage)
             {
                 //create a new client model
+                Messages.CreateNewModelMessage createMessage = (Messages.CreateNewModelMessage)message;
                 this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
                 this.clientModel.create(this.netWriter, "client");
-                //this.clientModel.MessageRecieved += (sender, args) => { };
+                this.clientModel.setId(createMessage.Id);
+                this.id = createMessage.Id;
                 if (NewModel != null)
                 {
                     NewModel(this, new EventArgs());

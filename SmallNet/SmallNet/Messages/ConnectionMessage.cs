@@ -9,8 +9,8 @@ namespace SmallNet.Messages
     {
 
         private String credentials;
-        public ConnectionMessage(String credentials)
-            : base()
+        public ConnectionMessage(Id id, String credentials)
+            : base(id)
         {
             this.credentials = credentials;
         }

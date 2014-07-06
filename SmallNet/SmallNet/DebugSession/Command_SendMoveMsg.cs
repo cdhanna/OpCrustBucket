@@ -28,7 +28,7 @@ namespace SmallNet.DebugSession
                     return "Cannot send empty message";
                 }
                 
-                debug.Client.sendMessage(new Messages.MoveMessage(int.Parse(paramString[0]), int.Parse(paramString[1])));
+                debug.Client.sendMessage(new Messages.MoveMessage(debug.Client, int.Parse(paramString[0]), int.Parse(paramString[1])));
                 return "Sent message";
             }
         }

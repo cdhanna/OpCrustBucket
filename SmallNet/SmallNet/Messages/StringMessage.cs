@@ -8,8 +8,8 @@ namespace SmallNet.Messages
     class StringMessage : SMessage
     {
         private String msg;
-        public StringMessage(String msg)
-            : base()
+        public StringMessage(Id id, String msg)
+            : base(id)
         {
             this.msg = msg;
         }

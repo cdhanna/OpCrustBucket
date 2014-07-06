@@ -12,7 +12,7 @@ namespace SmallNet
 
         double TargetTime { get; set; }
         string Owner { get; }
-
+        int Id { get; }
         EventHandler<MessageEventArgs> MessageRecieved { get; set; }
 
         void create(StreamWriter netWriter, string owner);
@@ -20,6 +20,9 @@ namespace SmallNet
         void keepTime();
         void update(GameTime time);
         void destroy();
+        
+        void setId(int id);
+
 
         bool validateMessage(SMessage message);
         void onMessage(SMessage message);

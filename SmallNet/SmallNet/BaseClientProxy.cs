@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    public class BaseClientProxy<T> where T: ClientModel 
+    public class BaseClientProxy<T> : Id where T: ClientModel 
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
@@ -23,11 +23,12 @@ namespace SmallNet
         public Boolean Debug { get; set; }
 
         private T clientModel;
+        private int id;
+        public int Id { get { return this.id; } }
 
-       
-        public BaseClientProxy(Socket socket, NetModel<T> model)
+        public BaseClientProxy(Socket socket, NetModel<T> model, int id)
         {
-
+            this.id = id;
             this.socket = socket;
             Stream socketStream = new NetworkStream(socket);
             this.netReader = new StreamReader(socketStream);

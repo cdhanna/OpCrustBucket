@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SmallNet
 {
    
-    public class BaseHost<T> where T:ClientModel
+    public class BaseHost<T> : Id where T:ClientModel
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -30,6 +30,8 @@ namespace SmallNet
         public bool IsRunning { get { return this.isRunning; } }
 
         public event EventHandler Connected;
+
+        public int Id { get { return SNetProp.HOST_ID; } }
 
         public BaseHost()
         {
@@ -53,11 +55,14 @@ namespace SmallNet
                         //accept a new client
                         Socket socket = tcpListener.AcceptSocket();
                         //create clientProxy, which puts it into the model
-                        BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model);
-                        client.sendMessage(new Messages.CreateNewModelMessage());
+                        
+                       // BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model, 0);
+                        BaseClientProxy<T> client = this.model.generateNewClient(socket);
+                        this.model.addClient(client);
+                        client.sendMessage(new Messages.CreateNewModelMessage(this, client.Id));
                         client.Debug = Debug;
                         log.Debug("got a connection");
-                        this.model.addClient(client);
+                        
                     }
                 }
                 catch (Exception e)
