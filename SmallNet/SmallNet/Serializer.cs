@@ -14,16 +14,16 @@ namespace SmallNet
     class Serializer
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        protected const string HEADBEG = "HEADER BEGINS";
-        protected const string HEADEND = "HEADER ENDS";
-        protected const string MSGEND = "MESSAGE ENDS";
-        protected const string OBJTYPE = "OBJECT TYPE: ";
+        protected const string HEADBEG = "HDRBEG";
+        protected const string HEADEND = "HDREND";
+        protected const string MSGEND = "MSGEND";
+        protected const string OBJTYPE = "OT: ";
         protected const string LHSIDSTR = "LHS = ";
         protected const string RHSIDSTR = "RHS = ";
         protected const string SEPIDSTR = "SEP = ";
-        protected const string LHS = "{";
-        protected const string RHS = "}";
-        protected const string SEP = ",";
+        protected const string LHS = "{<<";
+        protected const string RHS = ">>}";
+        protected const string SEP = "::";
         protected static bool flag = false;
         protected enum DATASTRUCTURES {NONE, ARRAY};
         //default constructor
@@ -41,13 +41,27 @@ namespace SmallNet
             return str;
         }
 
+        private static List<FieldInfo> getBaseFields(object obj)
+        {
+            // note that this only goes one level deep (or up I suppose) for now.
+            Type data = obj.GetType();
+            Type supData = data.BaseType;
+            List<FieldInfo> supFields = new List<FieldInfo>();
+            if (supData != null)
+            {
+                supFields = supData.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
+            }
+
+            return supFields;
+        }
         private static string writeLine(object obj, int layer)
         {
             Type data = obj.GetType();
             String tbs = "";
             String str = "";
-            FieldInfo[] fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-      
+            List<FieldInfo> bFields = getBaseFields(obj);
+            List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
+            fields.AddRange(bFields);
             foreach (FieldInfo f in fields)
             {
                 str += tbs + LHS;
@@ -116,10 +130,10 @@ namespace SmallNet
             int l = header.IndexOf(LHSIDSTR) + LHSIDSTR.Length;
             int r = header.IndexOf(RHSIDSTR) + RHSIDSTR.Length;
             int s = header.IndexOf(SEPIDSTR) + SEPIDSTR.Length;
-
-            left = header.Substring(l, 1);
-            right = header.Substring(r, 1);
-            delim = header.Substring(s, 1); //CHANGE the 1
+            int e = header.IndexOf(HEADEND);
+            left = header.Substring(l, r-l - RHSIDSTR.Length);
+            right = header.Substring(r, s-r - SEPIDSTR.Length);
+            delim = header.Substring(s, e-s);
 
             string body = str.Substring(str.IndexOf(HEADEND) + HEADEND.Length);
             if (body.Length != MSGEND.Length)
@@ -161,8 +175,10 @@ namespace SmallNet
         private static void writeVal(string msg, Object obj, string left, string right, string delim)
         {
             Type data = obj.GetType();
-            FieldInfo[] fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            List<string> fieldList = new List<string>(fields.Length);
+            List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
+            List<FieldInfo> bFields = getBaseFields(obj);
+            fields.AddRange(bFields);
+            List<string> fieldList = new List<string>(fields.Count);
             foreach (FieldInfo f in fields)
             {
                 fieldList.Add(f.Name);
@@ -172,15 +188,30 @@ namespace SmallNet
             while ( str.Length != 0)
             {
                 string[] pieces = str.Split((left + delim).ToCharArray());
-                int index = 0;
-                if (pieces[0] == "")
+                List<string> p = pieces.ToList<string>();
+
+                int idx = 0;
+                while (idx < p.Count)
                 {
-                    index = 1;
+                    if (p[idx].Length == 0)
+                    {
+                        p.Remove(p[idx]);
+                    }
+                    else
+                    {
+                        idx++;
+                    }
                 }
-                string type = pieces[index];
+               // pieces = p.ToArray();
+                int index = 0;
+                //if (pieces[0] == "")
+                //{
+                  //  index = 1;
+                //}
+                string type = p[index];
                 type = type.Replace(left,"");
                 int datStructType = isDataStruct(type);
-                string name = pieces[index+1];
+                string name = p[index+1];
                 switch (datStructType)
 
                 {
@@ -207,7 +238,7 @@ namespace SmallNet
                                     {
                                         if (elementType.IsPrimitive)
                                         {
-                                            string val = pieces[4 + i*3];
+                                            string val = p[4 + i*3];
                                             val = val.Replace(right, "");
                                             arr.SetValue(Convert.ChangeType(val, elementType), i);
                                         }
@@ -237,7 +268,7 @@ namespace SmallNet
                                     Type t = f.FieldType;// f.GetValue(obj).GetType(); 
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
-                                        string val = pieces[index+2];
+                                        string val = p[index+2];
                                         val = val.Replace(right, "");
                                         f.SetValue(obj, Convert.ChangeType(val, t));
                                         break;
