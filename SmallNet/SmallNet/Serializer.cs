@@ -11,6 +11,14 @@ using log4net;
 
 namespace SmallNet
 {
+    //TODO
+        // add recursive base parameter grabbing
+        // efficiency
+        // support additional data structures (list, hash, etc)
+        // generics
+        // checking for null values on serialize and deserialize
+        // rewrite the check for LHS and RHS tags to only match the entire sequence (so that individual characters of the tag
+            // can be used in strings
     class Serializer
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -26,16 +34,15 @@ namespace SmallNet
         protected const string SEP = "::";
         protected static bool flag = false;
         protected enum DATASTRUCTURES {NONE, ARRAY};
+
         //default constructor
         public Serializer()
         {
-    
     
         }
         public static String serialize(Object obj)
         {
             String str = writeHeader(obj);
-
             str += writeLine(obj, 0);
             str += completeMsg();
             return str;
@@ -67,12 +74,12 @@ namespace SmallNet
                 str += tbs + LHS;
                 if (f.FieldType.IsPrimitive || f.FieldType.Equals(typeof(String)))
                 {
+                    // may need to add support for null values
                     str += (f.FieldType.ToString() + SEP + f.Name + SEP + f.GetValue(obj).ToString() + RHS);
                 }
 
                 else if (f.FieldType.IsArray)
                 {
-                    
                     Array arr = (Array)f.GetValue(obj);
                     string arrayStr = (f.FieldType.ToString() + SEP + f.Name);
                     int size = arr.Length;
@@ -116,7 +123,6 @@ namespace SmallNet
         public static Object deserialize(String str)
         {
             Type t = getObjType(str);
-            
             ConstructorInfo c = t.GetConstructor(new Type[] { });
             Object obj = c.Invoke(new object[] { });
             deserialize(str, obj);
@@ -143,8 +149,6 @@ namespace SmallNet
             }
         }
 
-
-
         private static string writeHeader(object obj)
         {
             string str = "";
@@ -163,7 +167,6 @@ namespace SmallNet
             int len = str.IndexOf(LHSIDSTR) - beg;
             string typeStr = str.Substring(beg, len);
             Type t = Type.GetType(typeStr);
-            
             return t;
         }
 
@@ -213,11 +216,9 @@ namespace SmallNet
                 int datStructType = isDataStruct(type);
                 string name = p[index+1];
                 switch (datStructType)
-
                 {
                     case  1:
                         {
-
                             int lbrack = type.IndexOf("[");
                             int rbrack = type.IndexOf("]");
                             string sizeStr = type.Substring(lbrack+1, rbrack - lbrack-1);
@@ -226,7 +227,6 @@ namespace SmallNet
                             int x = fieldList.IndexOf(name);
                             
                             if (x != -1)
-
                             {
                                 FieldInfo f = fields[x];
                                 if (f.Name.Equals(name))
@@ -264,7 +264,6 @@ namespace SmallNet
                                 FieldInfo f = fields[x];
                                 if (f.Name.Equals(name))
                                 {
-
                                     Type t = f.FieldType;// f.GetValue(obj).GetType(); 
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
@@ -278,8 +277,7 @@ namespace SmallNet
                                     {
                                         str = str.Substring(str.IndexOf(left));
                                         writeVal(str, f.GetValue(obj), left, right, delim);
-                                    }
-                                    
+                                    }   
                                 }
                             }
                             break;
@@ -302,7 +300,8 @@ namespace SmallNet
 
         private static string getNextObj(string msg, string left, string right, string delim)
         {
-            
+            // probably crimminally inefficient. Try pulling all LHS and RHS indeces and then
+            // applying some logic instead of scanning char by char.
             int begin = msg.IndexOf(left);
             int balance = 1;
             int i = begin;
@@ -319,13 +318,11 @@ namespace SmallNet
         
         private static int isDataStruct(string type)
         {
-
             // lazy, only does binary check. 
             // LATER should handle any data struct type
             if (type.Length != 0 && type.Substring(type.Length -1,1).CompareTo("]") == 0)
             {
                 return 1;
-                
             }
             else
             {
@@ -334,5 +331,4 @@ namespace SmallNet
         }
     }
 
- 
 }
