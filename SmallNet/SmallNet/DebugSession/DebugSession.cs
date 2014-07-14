@@ -11,17 +11,17 @@ using log4net.Core;
 namespace SmallNet.DebugSession
 {
         
-    public class DebugSession <T> where T:ClientModel
+    public class DebugSession <T, H> where T:ClientModel where H:HostModel<T>
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         
-        private DebugForm<T> df;
+        private DebugForm<T, H> df;
         private Thread formThread;
         private LogWatcher logWatcher;
 
-        private BaseHost<T> host;
-        public BaseHost<T> Host { get { return this.host; } set { this.host = value; } }
+        private BaseHost<T, H> host;
+        public BaseHost<T, H> Host { get { return this.host; } set { this.host = value; } }
         private bool hostListener;
 
         private BaseClient<T> client;
@@ -36,15 +36,15 @@ namespace SmallNet.DebugSession
             logWatcher = new LogWatcher();
             logWatcher.Updated += logWatcher_Updated;
 
-            this.df = new DebugForm<T>(this);
-            this.df.addCommandOption(new Command_HostAndClient<T>());
-            this.df.addCommandOption(new Command_GetAllIP<T>());
-            this.df.addCommandOption(new Command_StartHost<T>());
-            this.df.addCommandOption(new Command_StopHost<T>());
-            this.df.addCommandOption(new Command_ConnectTo<T>());
-            this.df.addCommandOption(new Command_Disconnect<T>());
-            this.df.addCommandOption(new Command_SendMsg<T>());
-            this.df.addCommandOption(new Command_SendMoveMsg<T>());
+            this.df = new DebugForm<T, H>(this);
+            this.df.addCommandOption(new Command_HostAndClient<T, H>());
+            this.df.addCommandOption(new Command_GetAllIP<T, H>());
+            this.df.addCommandOption(new Command_StartHost<T, H>());
+            this.df.addCommandOption(new Command_StopHost<T, H>());
+            this.df.addCommandOption(new Command_ConnectTo<T, H>());
+            this.df.addCommandOption(new Command_Disconnect<T, H>());
+            this.df.addCommandOption(new Command_SendMsg<T, H>());
+            this.df.addCommandOption(new Command_SendMoveMsg<T, H>());
 
 
             this.formThread = new Thread(() =>
@@ -110,7 +110,7 @@ namespace SmallNet.DebugSession
                                 {
                                     Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
                                         {
-                                            df.appendOutput("MSG FROM " +mArgs.getMessage().SenderId + " : " + (mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
+                                            df.appendOutput("MSG FROM " +mArgs.getMessage().SenderId + " : " + (SNetUtil.getCurrentTime() - mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
                                         };
                                 };
 
@@ -131,7 +131,7 @@ namespace SmallNet.DebugSession
 
         }
 
-        public void runCommand(CommandOption<T> command, String[] parameters)
+        public void runCommand(CommandOption<T, H> command, String[] parameters)
         {
             this.commandQueue.Enqueue(new CommandParameter(command, parameters));
         }
@@ -145,9 +145,9 @@ namespace SmallNet.DebugSession
 
         class CommandParameter
         {
-            public CommandOption<T> command;
+            public CommandOption<T, H> command;
             public String[] paramString;
-            public CommandParameter(CommandOption<T> command, String[] paramString)
+            public CommandParameter(CommandOption<T, H> command, String[] paramString)
             {
                 this.command = command;
                 this.paramString = paramString;

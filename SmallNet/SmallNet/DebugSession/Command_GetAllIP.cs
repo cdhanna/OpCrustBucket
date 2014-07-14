@@ -5,14 +5,14 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_GetAllIP<T> : CommandOption<T> where T : ClientModel
+    class Command_GetAllIP<T, H> : CommandOption<T, H> where T : ClientModel where H:HostModel<T>
     {
         public Command_GetAllIP()
             : base("Get LAN IPs")
         {
         }
 
-        public override string runCommand(DebugSession<T> debug, String[] paramString)
+        public override string runCommand(DebugSession<T, H> debug, String[] paramString)
         {
             List<String> ips = SNetUtil.discoverIps();
             String ipString = "LAN IPs: " + Environment.NewLine + "\t";

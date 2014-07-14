@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using log4net;
-using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    public class TestClientModel : DefaultClientModel
+    class TestHostModel : DefaultHostModel<TestClientModel>
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
-
-        public override void init()
+        public override void updateHost(Microsoft.Xna.Framework.GameTime time)
         {
            // throw new NotImplementedException();
         }
 
-        public override void update(GameTime time)
+        public override void init()
         {
             //throw new NotImplementedException();
         }
@@ -33,10 +28,9 @@ namespace SmallNet
             return true;
         }
 
-
-        protected override void gotMessage(SMessage message)
+        public override void onMessage(SMessage message)
         {
-            log.Debug(this.Owner + " : onMessage " + message);
+            //throw new NotImplementedException();
         }
     }
 }

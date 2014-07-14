@@ -5,18 +5,18 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    public class Command_StartHost<T> : CommandOption<T> where T : ClientModel
+    public class Command_StartHost<T, H> : CommandOption<T, H> where T : ClientModel where H:HostModel<T>
     {
         public Command_StartHost()
             : base("Start Host")
         {
         }
 
-        public override String runCommand(DebugSession<T> debug, String[] paramString)
+        public override String runCommand(DebugSession<T, H> debug, String[] paramString)
         {
             if (debug.Host == null)
             {
-                debug.Host = new BaseHost<T>();
+                debug.Host = new BaseHost<T, H>();
                 debug.Host.start();
                 return "host created and started";
             }

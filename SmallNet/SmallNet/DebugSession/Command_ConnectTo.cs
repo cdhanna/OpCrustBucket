@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_ConnectTo<T> : CommandOption<T> where T : ClientModel
+    class Command_ConnectTo<T, H> : CommandOption<T, H> where T : ClientModel where H:HostModel<T>
     {
 
         public Command_ConnectTo()
@@ -13,7 +13,7 @@ namespace SmallNet.DebugSession
         {
         }
 
-        public override string runCommand(DebugSession<T> debug, string[] paramString)
+        public override string runCommand(DebugSession<T, H> debug, string[] paramString)
         {
             if (paramString.Length != 2)
             {

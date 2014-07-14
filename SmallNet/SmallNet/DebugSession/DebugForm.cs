@@ -13,22 +13,22 @@ using log4net.Core;
 
 namespace SmallNet.DebugSession
 {
-    public partial class DebugForm<T>: Form where T:ClientModel
+    public partial class DebugForm<T, H>: Form where T:ClientModel where H:HostModel<T>
     {
 
-        private List<CommandOption<T>> commandOptions;
-        private DebugSession<T> debug;
+        private List<CommandOption<T, H>> commandOptions;
+        private DebugSession<T, H> debug;
         private int lineCount;
-        private Dictionary<CommandOption<T>, String> parameterTable;
+        private Dictionary<CommandOption<T, H>, String> parameterTable;
 
         
 
-        public DebugForm(DebugSession<T> debug)
+        public DebugForm(DebugSession<T, H> debug)
         {
-            this.commandOptions = new List<CommandOption<T>>();
+            this.commandOptions = new List<CommandOption<T, H>>();
             this.debug = debug;
             this.lineCount = 0;
-            this.parameterTable = new Dictionary<CommandOption<T>, String>();
+            this.parameterTable = new Dictionary<CommandOption<T, H>, String>();
 
             
             InitializeComponent();
@@ -75,7 +75,7 @@ namespace SmallNet.DebugSession
             
         }
 
-        public void addCommandOption(CommandOption<T> command)
+        public void addCommandOption(CommandOption<T, H> command)
         {
             this.commandOptions.Add(command);
             this.commandOptionsBox.Items.Add(command);
@@ -88,7 +88,7 @@ namespace SmallNet.DebugSession
             this.Invoke((MethodInvoker)delegate
             {
                 
-                CommandOption<T> c = (CommandOption<T>)this.commandOptionsBox.SelectedItem;
+                CommandOption<T, H> c = (CommandOption<T, H>)this.commandOptionsBox.SelectedItem;
                 debug.runCommand(c, this.paramBox.Text.Split(' '));
                 
                 //String output = c.runCommand(this.debug, this.paramBox.Text.Split(' '));
@@ -106,7 +106,7 @@ namespace SmallNet.DebugSession
 
 
 
-            CommandOption<T> c = (CommandOption<T>)this.commandOptionsBox.SelectedItem;
+            CommandOption<T, H> c = (CommandOption<T, H>)this.commandOptionsBox.SelectedItem;
             if (this.parameterTable.ContainsKey(c))
             {
                 string p = this.parameterTable[c];

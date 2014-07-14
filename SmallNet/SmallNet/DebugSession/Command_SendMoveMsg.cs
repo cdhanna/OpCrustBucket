@@ -5,14 +5,14 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_SendMoveMsg<T> : CommandOption<T> where T : ClientModel
+    class Command_SendMoveMsg<T, H> : CommandOption<T, H> where T : ClientModel where H:HostModel<T>
     {
         public Command_SendMoveMsg()
             : base("Sent Move Message")
         {
         }
 
-        public override string runCommand(DebugSession<T> debug, string[] paramString)
+        public override string runCommand(DebugSession<T, H> debug, string[] paramString)
         {
             if (debug.Client == null)
             {
