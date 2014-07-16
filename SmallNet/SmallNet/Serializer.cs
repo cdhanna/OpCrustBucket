@@ -32,7 +32,7 @@ namespace SmallNet
         protected const string LHS = "{<<";
         protected const string RHS = ">>}";
         protected const string SEP = "::";
-        protected static bool flag = false;
+        protected static bool flag = false; // move into writeLine() eventually?
         protected enum DATASTRUCTURES {NONE, ARRAY};
 
         //default constructor
@@ -43,7 +43,7 @@ namespace SmallNet
         public static String serialize(Object obj)
         {
             String str = writeHeader(obj);
-            str += writeLine(obj, 0);
+            str += writeLine(obj); // recursively builds entire message
             str += completeMsg();
             return str;
         }
@@ -61,21 +61,23 @@ namespace SmallNet
 
             return supFields;
         }
-        private static string writeLine(object obj, int layer)
+        private static string writeLine(object obj)
         {
+            String str = ""; // begin with empty string
             Type data = obj.GetType();
-            String tbs = "";
-            String str = "";
-            List<FieldInfo> bFields = getBaseFields(obj);
+            List<FieldInfo> bFields = getBaseFields(obj); // get super fields
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
-            fields.AddRange(bFields);
+            fields.AddRange(bFields); // combine super fields with fields at this level
             foreach (FieldInfo f in fields)
             {
-                str += tbs + LHS;
+                str += LHS;
                 if (f.FieldType.IsPrimitive || f.FieldType.Equals(typeof(String)))
                 {
-                    // may need to add support for null values
-                    str += (f.FieldType.ToString() + SEP + f.Name + SEP + f.GetValue(obj).ToString() + RHS);
+                    // don't write nulls
+                    if (f.GetValue(obj) != null)
+                    {
+                        str += (f.FieldType.ToString() + SEP + f.Name + SEP + f.GetValue(obj).ToString() + RHS);
+                    }
                 }
 
                 else if (f.FieldType.IsArray)
@@ -92,28 +94,18 @@ namespace SmallNet
                             flag = true;
                             str += (LHS + element.GetType().ToString() );
                         }    
-                        str += writeLine(element,layer);
-                        str += flag ? (RHS ) : "";
+                        str += writeLine(element);
+                        str += flag ? RHS : "";
                         flag = false;
                     }
-                    str += (tbs + RHS);
+                    str += RHS;
                 }
-                else if (f.FieldType.IsSerializable)
-                {
-                    str += ("We don't know what to do with this, but its serializable!" + SEP);
-                    // MSDN example code. Not sure this really serialized the data (how could it??)
-                    //  PLACEHOLDER CODE
-                    //IFormatter form = new BinaryFormatter();
-                    //string streamdata = "datastuff.data";
-                    //FileStream fs = new FileStream(streamdata, FileMode.Create);
-                    //form.Serialize(fs, f.GetValue(obj));
-                    //fs.Close();
-                }
-                else
+
+                else // its an object that needs its own call to writeLine()
                 {
                     str += (f.FieldType.ToString() + SEP + f.Name);
-                    str += writeLine(f.GetValue(obj),layer + 1);
-                    str += (tbs + RHS);
+                    str += writeLine(f.GetValue(obj));
+                    str += RHS;
                 }
             }
 
@@ -122,15 +114,19 @@ namespace SmallNet
         }
         public static Object deserialize(String str)
         {
+            // Figure out type of object needed and instantiate a blank one.
             Type t = getObjType(str);
             ConstructorInfo c = t.GetConstructor(new Type[] { });
             Object obj = c.Invoke(new object[] { });
+
+            // Populate the newly instantiated blank onject with the data from the message.
             deserialize(str, obj);
             return obj;
         }
 
         public static void deserialize(String str, Object obj)
         {
+            // Determine syntax for header, delimiters, etc
             String left, right, delim;
             string header = str.Substring(str.IndexOf(HEADBEG), str.IndexOf(HEADEND) + HEADEND.Length);
             int l = header.IndexOf(LHSIDSTR) + LHSIDSTR.Length;
@@ -141,16 +137,18 @@ namespace SmallNet
             right = header.Substring(r, s-r - SEPIDSTR.Length);
             delim = header.Substring(s, e-s);
 
+            // Get the body of the message, and if it isn't empty, write the values into the object shell.
             string body = str.Substring(str.IndexOf(HEADEND) + HEADEND.Length);
             if (body.Length != MSGEND.Length)
             {
                 body = body.Substring(0, body.Length - MSGEND.Length);
-                writeVal(body, obj, left, right, delim);
+                writeVal(body, obj, left, right, delim); // recursively does all the work.
             }
         }
 
         private static string writeHeader(object obj)
         {
+            // Provides book keeping data for the message.
             string str = "";
             str += HEADBEG
                 + OBJTYPE + obj.GetType().ToString()
@@ -181,6 +179,8 @@ namespace SmallNet
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
             List<FieldInfo> bFields = getBaseFields(obj);
             fields.AddRange(bFields);
+
+            // this separate list just for names might be bloated. Can we get this info efficiently from the fields list?
             List<string> fieldList = new List<string>(fields.Count);
             foreach (FieldInfo f in fields)
             {
@@ -194,6 +194,9 @@ namespace SmallNet
                 List<string> p = pieces.ToList<string>();
 
                 int idx = 0;
+
+                // idiotic way of stripping the blank entries caused my multicharacter delimitters.
+                // REWRITE OR REMOVE THIS AT SOME POINT!
                 while (idx < p.Count)
                 {
                     if (p[idx].Length == 0)
@@ -205,12 +208,8 @@ namespace SmallNet
                         idx++;
                     }
                 }
-               // pieces = p.ToArray();
+
                 int index = 0;
-                //if (pieces[0] == "")
-                //{
-                  //  index = 1;
-                //}
                 string type = p[index];
                 type = type.Replace(left,"");
                 int datStructType = isDataStruct(type);
@@ -264,7 +263,7 @@ namespace SmallNet
                                 FieldInfo f = fields[x];
                                 if (f.Name.Equals(name))
                                 {
-                                    Type t = f.FieldType;// f.GetValue(obj).GetType(); 
+                                    Type t = f.FieldType; 
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
                                         string val = p[index+2];
@@ -305,7 +304,7 @@ namespace SmallNet
             int begin = msg.IndexOf(left);
             int balance = 1;
             int i = begin;
-            while (++i< msg.Length && balance != 0)
+            while (++i < msg.Length && balance != 0)
             {
                 string str = msg.Substring(i, left.Length);
                 if (str.CompareTo(left) == 0)
