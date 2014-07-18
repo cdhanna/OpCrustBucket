@@ -46,7 +46,7 @@ namespace SmallNet
 
             this.ipAddress = SNetUtil.getLocalIp();
             this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
-
+            
         }
 
         public void start()

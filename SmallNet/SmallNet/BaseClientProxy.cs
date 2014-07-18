@@ -31,6 +31,7 @@ namespace SmallNet
             this.id = id;
             this.socket = socket;
             Stream socketStream = new NetworkStream(socket);
+            
             this.netReader = new StreamReader(socketStream);
             this.netWriter = new StreamWriter(socketStream);
 
