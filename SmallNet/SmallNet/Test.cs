@@ -35,6 +35,9 @@ namespace SmallNet
         public Test()
             : base()
         {
+
+            Console.WriteLine("TWTSDFS");
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }

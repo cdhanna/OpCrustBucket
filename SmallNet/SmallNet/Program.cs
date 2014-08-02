@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 #endregion
 
 namespace SmallNet
@@ -23,8 +24,12 @@ namespace SmallNet
             //Messages.ConnectionMessage m2 = (Messages.ConnectionMessage)Serializer.deserialize(str);
             //SimpleNetTest test = new SimpleNetTest();
             Console.WriteLine("program");
+           // Test t = new Test();
             using (var game = new Test())
+            {
+                Console.WriteLine("Sdfsdfsdfsdfsf");
                 game.Run();
+            }
 
             //SNetConnector snc = new SNetConnector();
 

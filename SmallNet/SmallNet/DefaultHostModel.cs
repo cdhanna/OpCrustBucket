@@ -70,6 +70,15 @@ namespace SmallNet
             this.updateHost(time);
         }
 
+        public void onShutdown()
+        {
+            SMessage msg = new Messages.DisconnectionMessage();
+            foreach (BaseClientProxy<T> proxy in this.clients)
+            {
+                proxy.sendMessage(msg);
+            }
+        }
+
         public abstract void updateHost(GameTime time);
         public abstract void init();
 

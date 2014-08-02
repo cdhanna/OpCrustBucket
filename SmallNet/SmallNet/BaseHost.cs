@@ -46,12 +46,6 @@ namespace SmallNet
 
 
             this.tcpListener = new TcpListener(IPAddress.Parse("0.0.0.0"), SNetProp.getPort());
-          //  this.tcpListener = new TcpListener("0.0.0.0", SNetProp.getPort());
-            //this.tcpListener.AllowNatTraversal(true);
-           
-           // IPEndPoint ep = new IPEndPoint(ip, SNetProp.getPort());
-
-            //new TcpListener(
         }
 
         public void start()
@@ -65,29 +59,29 @@ namespace SmallNet
                     while (clientAcceptorThreadRunner)
                     {
                         Console.WriteLine("waiting for connection form a client");
+
                         //accept a new client
-                       // TcpClient tc =  tcpListener.AcceptTcpClient();
-
-
-
                         Socket socket = tcpListener.AcceptSocket();
                         //create clientProxy, which puts it into the model
 
-                        // BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model, 0);
                         BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);
                         this.hostModel.addClient(client);
                         client.sendMessage(new Messages.CreateNewModelMessage(this, client.Id));
                         client.Debug = Debug;
                         log.Debug("got a connection");
-                        
+
                     }
+                }
+                catch (ThreadAbortException e)
+                {
+                    log.Debug("Client Acceptor thread aborted");
                 }
                 catch (Exception e)
                 {
                     log.Debug("client acceptor thread has stopped... " + e.Message);
                 }
             });
-this.clientAcceptorThread.Start();
+            this.clientAcceptorThread.Start();
             this.clientAcceptorThreadRunner = true;
             this.tcpListener.Start();
             this.clientAcceptorThread.Name = "HOST:CLIENTACCEPTER";
@@ -109,10 +103,12 @@ this.clientAcceptorThread.Start();
         {
             try
             {
+
+                this.hostModel.onShutdown();
                 this.tcpListener.Stop();
                 this.clientAcceptorThreadRunner = false;
                 this.clientAcceptorThread.Abort();
-
+                
                 log.Debug("host shutdown");
 
                 this.isRunning = false;
@@ -120,6 +116,9 @@ this.clientAcceptorThread.Start();
             }
             catch (Exception e)
             {
+
+                Console.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
+
             }
             
         }

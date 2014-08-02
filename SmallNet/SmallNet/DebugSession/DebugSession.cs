@@ -55,6 +55,10 @@ namespace SmallNet.DebugSession
                 {
                     System.Windows.Forms.Application.Run(df);
                 }
+                catch (ThreadAbortException e)
+                {
+                    Console.WriteLine("Debug has been aborted");
+                }
                 catch (Exception e)
                 {
                     Console.WriteLine("DEBUG SESSION EXCEPTION AHOY!");
@@ -80,49 +84,54 @@ namespace SmallNet.DebugSession
             this.commandQueue = new Queue<CommandParameter>();
             this.commandThread = new Thread(() =>
             {
-
-                while (true)
-                {
-                    if (commandQueue.Count > 0)
+                try{
+                    while (true)
                     {
-                        CommandParameter cp = this.commandQueue.Dequeue();
-                        df.appendOutput(cp.command.runCommand(this, cp.paramString));
-
-
-                        if (Host != null && !this.hostListener)
+                        if (commandQueue.Count > 0)
                         {
-                            this.hostListener = true;
-                            Host.Connected += (sender2, args) =>
+                            CommandParameter cp = this.commandQueue.Dequeue();
+                            df.appendOutput(cp.command.runCommand(this, cp.paramString));
+
+
+                            if (Host != null && !this.hostListener)
                             {
+                                this.hostListener = true;
+                                Host.Connected += (sender2, args) =>
+                                {
+                                    df.setHostOnBox(Host.IsRunning);
+                                };
                                 df.setHostOnBox(Host.IsRunning);
-                            };
-                            df.setHostOnBox(Host.IsRunning);
+                            }
+                            if (Client != null && !this.clientListener)
+                            {
+                                this.clientListener = true;
+                                Client.Connected += (sender2, args) =>
+                                    {
+                                        df.setClientOnBox(Client.IsRunning);
+
+                                    };
+                                Client.NewModel += (sender2, args) =>
+                                    {
+                                        Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
+                                            {
+                                                df.appendOutput("MSG FROM " + mArgs.getMessage().SenderId + " : " + (SNetUtil.getCurrentTime() - mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
+                                            };
+                                    };
+
+
+
+                                df.setClientOnBox(Client.IsRunning);
+                            }
+
                         }
-                        if (Client != null && !this.clientListener)
-                        {
-                            this.clientListener = true;
-                            Client.Connected += (sender2, args) =>
-                                {
-                                    df.setClientOnBox(Client.IsRunning);
-                            
-                                };
-                            Client.NewModel += (sender2, args) =>
-                                {
-                                    Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
-                                        {
-                                            df.appendOutput("MSG FROM " +mArgs.getMessage().SenderId + " : " + (SNetUtil.getCurrentTime() - mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
-                                        };
-                                };
-
-  
-
-                           df.setClientOnBox(Client.IsRunning);
-                        }
-
+                        Thread.Sleep(10);
                     }
-                    Thread.Sleep(10);
                 }
-
+                catch (ThreadAbortException e)
+                {
+                        Console.WriteLine("Debug Command thread aborted");
+                }
+            
 
             });
             this.commandThread.Name = "DEBUG:COMMAND";
@@ -138,8 +147,17 @@ namespace SmallNet.DebugSession
 
         public void stop()
         {
-          //  System.Windows.Forms.Application.Exit();
-            //this.formThread.Abort();
+            //if (this.client != null)
+            //    this.client.disconnect();
+
+            if (this.host != null)
+                this.host.shutdown();
+
+           
+            this.formThread.Abort();
+            this.commandThread.Abort();
+
+           // System.Windows.Forms.Application.Exit();
           
         }
 

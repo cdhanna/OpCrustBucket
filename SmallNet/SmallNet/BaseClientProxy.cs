@@ -49,13 +49,24 @@ namespace SmallNet
             this.model.removeClient(this);
             log.Debug("client removed from net model");
         }
+
+        public void kill()
+        {
+            Console.WriteLine("KILLING PROXY");
+            
+           // netReader.Dispose();
+            //recieverThread.Abort();
+            
+            loop = false;
+        }
+        bool loop = true;
         private void startRecieverThread()
         {
             this.recieverThread = new Thread(() =>
             {
                 try
                 {
-                    bool loop = true;
+                   
                     while (loop) //listen forever
                     {
                         string netMessage = netReader.ReadLine();
@@ -66,11 +77,11 @@ namespace SmallNet
                         if (smessage is Messages.DisconnectionMessage)
                         {
                             loop = false;
+                            netReader.Close();
                             removeFromModel();
                             if (this.clientModel != null)
                             {
                                 this.clientModel.destroy();
-                                
                             }
                         }
                         log.Debug(this.clientModel.Owner + " going to recieve method");
@@ -78,11 +89,16 @@ namespace SmallNet
 
                         Thread.Sleep(5);
                     }
+                    log.Debug("client proxy reciever has stopped gracefully:: ");
+                }
+                catch (ThreadAbortException e)
+                {
+                    Console.WriteLine("client proxy reciever has kicked the bucket");
                 }
                 catch (Exception e)
                 {
-                    throw e;
-                    //log.Debug("client proxy reciever has stopped:: " + e.StackTrace);
+                    //throw e;
+                    log.Debug("client proxy reciever has stopped:: " + e.Message);
                     //log.Debug("ERROR: " + e.);
                 }
             });

@@ -22,6 +22,8 @@ namespace SmallNet
 
         bool validateMessage(SMessage message);
         void onMessage(SMessage message);
+
+        void onShutdown();
        // void sendMessage(SMessage message);
 
 

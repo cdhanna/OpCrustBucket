@@ -129,8 +129,11 @@ namespace SmallNet
 
         }
 
-
         public void disconnect()
+        {
+            disconnect(true);
+        }
+        public void disconnect(bool notify)
         {
             if (!this.connected)
             {
@@ -140,8 +143,11 @@ namespace SmallNet
             try
             {
                 this.clientModel.destroy();
-                
-                this.sendMessage(new Messages.DisconnectionMessage(this));
+                this.netReader.Close();
+                if (notify)
+                {
+                    this.sendMessage(new Messages.DisconnectionMessage(this));
+                }
                 this.recieverThread.Abort();
                 this.connected = false;
                 
@@ -190,9 +196,13 @@ namespace SmallNet
 
                 this.fireConnected();
             }
+            else if (message is Messages.DisconnectionMessage)
+            {
+                this.disconnect(false);
+            }
             else
             {
-                
+
                 this.clientModel.onMessage(message); // no need to validate it here, because it has already been validated server side.
             }
         }
