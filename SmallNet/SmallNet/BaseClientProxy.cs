@@ -35,7 +35,8 @@ namespace SmallNet
             this.netReader = new StreamReader(socketStream);
             this.netWriter = new StreamWriter(socketStream);
 
-            this.netWriter.AutoFlush = true;
+            SNetUtil.configureStreams(netReader, netWriter);
+
             this.model = model;
 
             this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
@@ -70,6 +71,7 @@ namespace SmallNet
                     while (loop) //listen forever
                     {
                         string netMessage = netReader.ReadLine();
+                       // netReader.DiscardBufferedData();
                         log.Debug(this.clientModel.Owner + " recieved msg- " + netMessage);
                         //Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
                         SMessage smessage = SNetUtil.decodeMessage(netMessage);
@@ -85,7 +87,7 @@ namespace SmallNet
                             }
                         }
                         log.Debug(this.clientModel.Owner + " going to recieve method");
-                        recieveMessage(smessage);
+                        recieveMessage(smessage, netMessage);
 
                         Thread.Sleep(5);
                     }
@@ -106,13 +108,13 @@ namespace SmallNet
             this.recieverThread.Start();
         }
 
-        protected void recieveMessage(SMessage message)
+        protected void recieveMessage(SMessage message, String rawMessage)
         {
 
             if (this.clientModel.validateMessage(message))
             {
                 this.clientModel.onMessage(message);
-                this.model.sendMessageToAll(message);
+                this.model.sendMessageToAll(message, rawMessage);
             }
             
 
@@ -124,6 +126,10 @@ namespace SmallNet
             //this.netWriter.WriteLine(msg, parameters);
             //log.Debug("send msg- " + msg);
             this.clientModel.sendMessage(message);
+        }
+        public void sendMessage(String rawMessage)
+        {
+            this.clientModel.sendMessage(rawMessage);
         }
 
         public void update(GameTime time)

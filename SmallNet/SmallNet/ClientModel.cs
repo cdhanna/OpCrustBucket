@@ -27,6 +27,6 @@ namespace SmallNet
         bool validateMessage(SMessage message);
         void onMessage(SMessage message);
         void sendMessage(SMessage message);
-
+        void sendMessage(String rawMessage);
     }
 }

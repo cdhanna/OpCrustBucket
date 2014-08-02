@@ -25,7 +25,8 @@ namespace SmallNet
         {
             // Get the memory appender
             memoryAppender = (SMemAppender)Array.Find<IAppender>(LogManager.GetRepository().GetAppenders(), GetMemoryAppender);
-
+            if (memoryAppender == null)
+                return;
             // Read in the log content
             this.logContent = GetEvents(memoryAppender);
 
@@ -60,6 +61,8 @@ namespace SmallNet
 
         public string GetEvents(SMemAppender memoryAppender)
         {
+            if (memoryAppender == null)
+                return "";
             StringBuilder output = new StringBuilder();
 
             // Get any events that may have occurred

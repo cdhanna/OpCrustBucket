@@ -47,7 +47,7 @@ namespace SmallNet
             this.clients.Remove(client);
         }
 
-        public void sendMessageToAll(SMessage message)
+        public void sendMessageToAll(SMessage message, String rawMessage)
         {
             if (!this.validateMessage(message))
                 return;
@@ -57,8 +57,14 @@ namespace SmallNet
 
             foreach (BaseClientProxy<T> proxy in this.clients)
             {
-                proxy.sendMessage(message);
+                //proxy.sendMessage(message);
+                proxy.sendMessage(rawMessage);
             }
+        }
+        public void sendMessageToAll(SMessage message)
+        {
+            String rawMessage = SNetUtil.encodeMessage(message);
+            this.sendMessageToAll(message, rawMessage);
         }
 
         public void update(GameTime time)

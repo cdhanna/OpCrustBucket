@@ -62,6 +62,10 @@ namespace SmallNet
 
                         //accept a new client
                         Socket socket = tcpListener.AcceptSocket();
+                        
+                        socket.NoDelay = true;
+                        
+
                         //create clientProxy, which puts it into the model
 
                         BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);
@@ -123,10 +127,10 @@ namespace SmallNet
             
         }
 
-        public void sendMessageToAll(SMessage message)
-        {
-            this.hostModel.sendMessageToAll(message);
-        }
+        //public void sendMessageToAll(SMessage message)
+        //{
+        //    this.hostModel.sendMessageToAll(message);
+        //}
 
         public void update(GameTime time)
         {

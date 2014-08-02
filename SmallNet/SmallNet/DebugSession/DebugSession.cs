@@ -114,7 +114,8 @@ namespace SmallNet.DebugSession
                                     {
                                         Client.ClientModel.MessageRecieved += (sender3, mArgs) =>
                                             {
-                                                df.appendOutput("MSG FROM " + mArgs.getMessage().SenderId + " : " + (SNetUtil.getCurrentTime() - mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
+                                                long now = SNetUtil.getCurrentTime();
+                                                df.appendOutput("MSG FROM " + mArgs.getMessage().SenderId + " : " + (now - mArgs.getMessage().TimeSent) + " - " + mArgs.getMessage().ToString() + Environment.NewLine);
                                             };
                                     };
 

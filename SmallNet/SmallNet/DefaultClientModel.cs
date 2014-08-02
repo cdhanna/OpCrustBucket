@@ -66,6 +66,10 @@ namespace SmallNet
 
         public void onMessage(SMessage message)
         {
+
+            log.Debug("MESSAGE GOT: " + (SNetUtil.getCurrentTime() - message.TimeSent));
+
+
             if (messageRecieved != null)
             {
                 MessageRecieved(this, new MessageEventArgs(message));
@@ -80,10 +84,15 @@ namespace SmallNet
             //construct a message
             String msg = SNetUtil.encodeMessage(message);
 
-            //send the message
-            this.netWriter.WriteLine(msg);
+            this.sendMessage(msg);
+        }
 
-            log.Debug( this.Owner + " send msg- " + msg);
+        public virtual void sendMessage(String rawMessage)
+        {
+            //send the message
+            this.netWriter.WriteLine(rawMessage);
+            this.netWriter.Flush();
+            log.Debug(this.Owner + " send msg- " + rawMessage);
         }
 
         public void keepTime()

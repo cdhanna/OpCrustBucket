@@ -19,6 +19,7 @@ namespace SmallNet
         private StreamWriter netWriter;
         private StreamReader netReader;
         private TcpClient tcp;
+       // private Socket sock;
         private bool connected;
 
         private Thread recieverThread;
@@ -49,6 +50,7 @@ namespace SmallNet
             log.Debug(" connection timeout");
             this.connectTimer.Enabled = false;
             this.tcp.Close();
+            //sock.Close();
         }
 
        
@@ -72,9 +74,18 @@ namespace SmallNet
             //initiate the connection
             try
             {
+                //Socket sockIt = new Socket(AddressFamily.
+
                 this.tcp = new TcpClient();
-                
+               
                 tcp = new TcpClient(hostIpAddress, SNetProp.getPort());
+                tcp.Client.NoDelay = true;
+
+                // sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                //sock.Connect(hostIpAddress, SNetProp.getPort());
+
+                //sock.NoDelay = true;
+
                 //tcp.Connect(new IPEndPoint(IPAddress.Parse(hostIpAddress), SNetProp.getPort()));
               //  this.tcp.Connect(hostIpAddress, SNetProp.getPort());
             }
@@ -89,11 +100,14 @@ namespace SmallNet
 
             this.connectTimer.Enabled = false;
             //initiate the data-flow streams
+            
             Stream netStream = this.tcp.GetStream();
             this.netWriter = new StreamWriter(netStream);
             this.netReader = new StreamReader(netStream);
 
-            this.netWriter.AutoFlush = true;
+
+            SNetUtil.configureStreams(netReader, netWriter);
+
 
             this.sendMessage(new Messages.ConnectionMessage(this, credentials));
 
@@ -109,6 +123,8 @@ namespace SmallNet
                         {
                             //decode incoming messages, and pass them to the recievedMessage()
                             string receivedMsg = netReader.ReadLine();
+                            //netReader.DiscardBufferedData();
+                            
                             log.Debug("recieved msg- " + receivedMsg);
                            // Tuple<string, string[]> data = SNetUtil.decodeMessage(receivedMsg);
                             SMessage message = SNetUtil.decodeMessage(receivedMsg);
@@ -215,6 +231,7 @@ namespace SmallNet
             {
                 String msg = SNetUtil.encodeMessage(message);
                 this.netWriter.WriteLine(msg);
+                this.netWriter.Flush();
                 log.Debug("sent connection message");
             }
             else

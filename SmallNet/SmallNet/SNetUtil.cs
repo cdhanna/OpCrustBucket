@@ -15,6 +15,11 @@ namespace SmallNet
 
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public static void configureStreams(StreamReader reader, StreamWriter writer)
+        {
+           // writer.AutoFlush = true;
+            
+        }
 
         /// <summary>
         /// Encode a message type with parameters.
@@ -117,7 +122,8 @@ namespace SmallNet
 
         public static long getCurrentTime()
         {
-            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            //return (long)DateTime.UtcNow.Millisecond;
+           return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
         }
 
         public T createClientModel<T>(StreamWriter netWriter, string owner) where T : ClientModel 

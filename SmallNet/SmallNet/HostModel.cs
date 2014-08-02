@@ -13,7 +13,7 @@ namespace SmallNet
         BaseClientProxy<T> generateNewClient(Socket socket);
         void addClient(BaseClientProxy<T> client);
         void removeClient(BaseClientProxy<T> client);
-        void sendMessageToAll(SMessage message);
+        void sendMessageToAll(SMessage message, String rawMessage);
         void update(GameTime time);
 
         void init();
