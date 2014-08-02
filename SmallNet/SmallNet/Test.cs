@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.GamerServices;
 using System.Net.Sockets;
 using System.IO;
-using Open.Nat;
+
 
 using System.Diagnostics;
 using System.Linq;
