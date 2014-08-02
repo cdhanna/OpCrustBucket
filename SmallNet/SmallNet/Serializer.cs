@@ -21,17 +21,14 @@ namespace SmallNet
     class Serializer
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        protected const string HEADBEG = "HDRBEG";
-        protected const string HEADEND = "HDREND";
-        protected const string MSGEND = "MSGEND";
+        protected const string HEADBEG = "HB";
+        protected const string HEADEND = "HE";
+        protected const string MSGEND = "ME";
         protected const string OBJTYPE = "OT: ";
-        protected const string LHSIDSTR = "LHS = ";
-        protected const string RHSIDSTR = "RHS = ";
-        protected const string SEPIDSTR = "SEP = ";
-        protected const string LHS = "{<<";
-        protected const string RHS = ">>}";
-        protected const string SEP = "::";
-        protected const string STRHDR = "/S/";
+        protected const string LHS = "{<";
+        protected const string RHS = ">}";
+        protected const string SEP = ":";
+        protected const string STRHDR = "SS";
         protected static bool flag = false; // move into writeLine() eventually?
         protected enum DATASTRUCTURES {NONE, ARRAY};
 
@@ -135,23 +132,14 @@ namespace SmallNet
 
         public static void deserialize(String str, Object obj)
         {
-            // Determine syntax for header, delimiters, etc
-            String left, right, delim;
             string header = str.Substring(str.IndexOf(HEADBEG), str.IndexOf(HEADEND) + HEADEND.Length);
-            int l = header.IndexOf(LHSIDSTR) + LHSIDSTR.Length;
-            int r = header.IndexOf(RHSIDSTR) + RHSIDSTR.Length;
-            int s = header.IndexOf(SEPIDSTR) + SEPIDSTR.Length;
-            int e = header.IndexOf(HEADEND);
-            left = header.Substring(l, r-l - RHSIDSTR.Length);
-            right = header.Substring(r, s-r - SEPIDSTR.Length);
-            delim = header.Substring(s, e-s);
 
             // Get the body of the message, and if it isn't empty, write the values into the object shell.
             string body = str.Substring(str.IndexOf(HEADEND) + HEADEND.Length);
             if (body.Length != MSGEND.Length)
             {
                 body = body.Substring(0, body.Length - MSGEND.Length);
-                writeVal(body, obj, left, right, delim); // recursively does all the work.
+                writeVal(body, obj); // recursively does all the work.
             }
         }
 
@@ -161,9 +149,6 @@ namespace SmallNet
             string str = "";
             str += HEADBEG
                 + OBJTYPE + obj.GetType().ToString()
-                + LHSIDSTR + LHS
-                + RHSIDSTR + RHS
-                + SEPIDSTR + SEP 
                 + HEADEND;
             return str;
         }
@@ -171,7 +156,7 @@ namespace SmallNet
         public static Type getObjType(String str)
         {
             int beg = str.IndexOf(OBJTYPE) + OBJTYPE.Length;
-            int len = str.IndexOf(LHSIDSTR) - beg;
+            int len = str.IndexOf(HEADEND) - beg;
             string typeStr = str.Substring(beg, len);
             Type t = Type.GetType(typeStr);
             return t;
@@ -182,7 +167,7 @@ namespace SmallNet
             return MSGEND;
         }
 
-        private static void writeVal(string msg, Object obj, string left, string right, string delim)
+        private static void writeVal(string msg, Object obj)
         {
             Type data = obj.GetType();
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
@@ -195,17 +180,16 @@ namespace SmallNet
             {
                 fieldList.Add(f.Name);
             }
-            string str = getNextObj(msg, left, right);
+            string str = getNextObj(msg, LHS, RHS);
             
             while ( str.Length != 0)
             {
-                string[] pieces = str.Split((left + delim).ToCharArray());
+                string[] pieces = str.Split((LHS + RHS).ToCharArray());
                 List<string> p = pieces.ToList<string>();
-                p = splitIntoFields(str,delim);
+                p = splitIntoFields(str,SEP);
 
                 int index = 0;
                 string type = p[index];
-                //type = type.Replace(left,"");
                 int datStructType = isDataStruct(type);
                 string name = p[index+1];
                 switch (datStructType)
@@ -216,7 +200,7 @@ namespace SmallNet
                             int rbrack = type.IndexOf("]");
                             string sizeStr = type.Substring(lbrack+1, rbrack - lbrack-1);
                             int size = Convert.ToInt32(sizeStr);
-                            str = str.Substring(str.IndexOf(left));
+                            str = str.Substring(str.IndexOf(LHS));
                             int x = fieldList.IndexOf(name);
                             
                             if (x != -1)
@@ -232,17 +216,17 @@ namespace SmallNet
                                         if (elementType.IsPrimitive)
                                         {
                                             string val = p[4 + i*3];
-                                            val = val.Replace(right, "");
+                                            val = val.Replace(RHS, "");
                                             arr.SetValue(Convert.ChangeType(val, elementType), i);
                                         }
                                         else
                                         { // only writing one element, 
                                             str = str.Substring(1);
-                                            str = str.Substring(str.IndexOf(left));
-                                            str = str.Insert(0, left);
-                                            str = getNextObj(str, left, right);
-                                            writeVal(str, arr.GetValue(i), left, right, delim);
-                                            str = msg.Substring(msg.IndexOf(str) + str.Length + right.Length);
+                                            str = str.Substring(str.IndexOf(LHS));
+                                            str = str.Insert(0, LHS);
+                                            str = getNextObj(str, LHS, RHS);
+                                            writeVal(str, arr.GetValue(i));
+                                            str = msg.Substring(msg.IndexOf(str) + str.Length + RHS.Length);
                                         }
                                     }   
                                 }
@@ -261,19 +245,15 @@ namespace SmallNet
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
                                         string val = p[index+2];
-                                        val = val.Replace(right, "");
-                                        //if (t.Equals(typeof(string)))
-                                        //{
-                                        //    val = stripStringHeader(val);
-                                        //}
+                                        val = val.Replace(RHS, "");
                                         f.SetValue(obj, Convert.ChangeType(val, t));
                                         break;
                                     }
                                     
                                     else
                                     {
-                                        str = str.Substring(str.IndexOf(left));
-                                        writeVal(str, f.GetValue(obj), left, right, delim);
+                                        str = str.Substring(str.IndexOf(LHS));
+                                        writeVal(str, f.GetValue(obj));
                                     }   
                                 }
                             }
@@ -281,16 +261,14 @@ namespace SmallNet
                         }
                 }
                
-                    //msg = msg.Substring(1, msg.Length - 1);
-                    msg = msg.Substring(str.Length + left.Length + right.Length);
-                    if (msg.IndexOf(left) != -1)
+                    msg = msg.Substring(str.Length + LHS.Length + RHS.Length);
+                    if (msg.IndexOf(LHS) != -1)
                     {
-                        //msg = msg.Substring(msg.IndexOf(left));
-                        str = getNextObj(msg, left, right);
+                        str = getNextObj(msg, LHS, RHS);
                     }
                     else
                     {
-                        msg = msg.Insert(0, left);
+                        msg = msg.Insert(0, LHS);
                         str = "";
                     }
             }
@@ -300,6 +278,9 @@ namespace SmallNet
         {
             // probably crimminally inefficient. Try pulling all LHS and RHS indeces and then
             // applying some logic instead of scanning char by char.
+
+            // msg always contains its leading LHS control. so known left origin
+            
             int begin = msg.IndexOf(left);
             int balance = 1;
             int i = begin;
