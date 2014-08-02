@@ -22,6 +22,7 @@ namespace SmallNet
             //string str = Serializer.serialize(m1);
             //Messages.ConnectionMessage m2 = (Messages.ConnectionMessage)Serializer.deserialize(str);
             //SimpleNetTest test = new SimpleNetTest();
+            Console.WriteLine("program");
             using (var game = new Test())
                 game.Run();
 

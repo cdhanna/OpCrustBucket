@@ -98,6 +98,7 @@ namespace SmallNet.DebugSession
 
 
             });
+            paramBox.Text = "";
         }
 
         private void commandOptionsBox_SelectedValueChanged(object sender, EventArgs e)

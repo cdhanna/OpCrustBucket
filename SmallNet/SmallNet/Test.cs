@@ -63,11 +63,11 @@ namespace SmallNet
 
             //Console.WriteLine("init");
 
-            debug = new DebugSession.DebugSession<TestClientModel, TestHostModel>();
+           debug = new DebugSession.DebugSession<TestClientModel, TestHostModel>();
 
             debug.start();
 
-
+            Console.WriteLine("hello???");
             base.Initialize();
         }
 
