@@ -15,7 +15,7 @@ namespace SmallNet
         public const int HOST_ID = 1;
         public static int getPort()
         {
-            return 9004;
+            return 5005;
         }
 
     }

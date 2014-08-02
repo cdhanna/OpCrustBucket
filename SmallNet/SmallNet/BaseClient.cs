@@ -73,11 +73,16 @@ namespace SmallNet
             try
             {
                 this.tcp = new TcpClient();
-                this.tcp.Connect(hostIpAddress, SNetProp.getPort());
+                
+                tcp = new TcpClient(hostIpAddress, SNetProp.getPort());
+                //tcp.Connect(new IPEndPoint(IPAddress.Parse(hostIpAddress), SNetProp.getPort()));
+              //  this.tcp.Connect(hostIpAddress, SNetProp.getPort());
             }
             catch (SocketException e)
             {
-                log.Debug("Client could not establish tcp");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                //log.Debug("Client could not establish tcp");
                 return;
             }
 

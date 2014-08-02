@@ -44,26 +44,29 @@ namespace SmallNet
 
         public SNetConnector()
         {
-             ipHostInfo = Dns.Resolve(serverName);
-             ipHost = ipHostInfo.AddressList[0];
-             remoteEP = new IPEndPoint(ipHost, port);
 
 
-             openConnection();
-             MessageRecieved += (sender, args) =>
-             {
-                 Console.WriteLine(args.msg);
-             };
+
+            ipHostInfo = Dns.Resolve(serverName);
+            ipHost = ipHostInfo.AddressList[0];
+            remoteEP = new IPEndPoint(ipHost, port);
 
 
-             sendNotificationMessage();
-             sendNotificationMessage();
-   
+            openConnection();
+            MessageRecieved += (sender, args) =>
+            {
+                Console.WriteLine(args.msg);
+            };
 
 
-             Thread.Sleep(1500); 
-            
-             closeConnection();
+            sendNotificationMessage();
+            sendNotificationMessage();
+
+
+
+            Thread.Sleep(1500);
+
+            closeConnection();
         }
 
         protected virtual void OnMessageRecieved(SNetConnectorMessageEventArgs e)

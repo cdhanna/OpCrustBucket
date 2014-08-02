@@ -22,10 +22,10 @@ namespace SmallNet.DebugSession
             string ip = paramString[0];
             string cred = paramString[1];
 
-            if (!SNetUtil.discoverIps().Contains(ip) && ip != SNetUtil.getLocalIp())
-            {
-                return "given IP address does not exist";
-            }
+            //if (!SNetUtil.discoverIps().Contains(ip) && ip != SNetUtil.getLocalIp())
+            //{
+            //    return "given IP address does not exist";
+            //}
 
             if (debug.Client == null)
             {
