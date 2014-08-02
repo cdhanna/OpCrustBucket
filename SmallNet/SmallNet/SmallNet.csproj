@@ -11,7 +11,7 @@
     <RootNamespace>SmallNet</RootNamespace>
     <AssemblyName>SmallNet</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -46,6 +46,8 @@
     <Compile Include="DebugSession\Command_ConnectTo.cs" />
     <Compile Include="DebugSession\Command_Disconnect.cs" />
     <Compile Include="DebugSession\Command_GetAllIP.cs" />
+    <Compile Include="DebugSession\Command_HostAndClient.cs" />
+    <Compile Include="DebugSession\Command_SendMoveMsg.cs" />
     <Compile Include="DebugSession\Command_SendMsg.cs" />
     <Compile Include="DebugSession\Command_StartHost.cs" />
     <Compile Include="DebugSession\CommandOption.cs" />
@@ -58,26 +60,44 @@
     </Compile>
     <Compile Include="DebugSession\DebugSession.cs" />
     <Compile Include="DefaultClientModel.cs" />
+    <Compile Include="DefaultHostModel.cs" />
+    <Compile Include="Id.cs" />
+    <Compile Include="HostModel.cs" />
     <Compile Include="LogWatcher.cs" />
     <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="Messages\MoveMessage.cs" />
     <Compile Include="Messages\ConnectionMessage.cs" />
     <Compile Include="Messages\CreateNewModelMessage.cs" />
     <Compile Include="Messages\DisconnectionMessage.cs" />
     <Compile Include="Messages\StringMessage.cs" />
     <Compile Include="NetModel.cs" />
+    <Compile Include="Samples\BallMoveMessage.cs" />
+    <Compile Include="Samples\Camera2D.cs" />
+    <Compile Include="Samples\ChangeBallVelMessage.cs" />
+    <Compile Include="Samples\KeyboardHelper.cs" />
+    <Compile Include="Samples\PaddleMoveMessage.cs" />
+    <Compile Include="Samples\PongGame.cs" />
+    <Compile Include="Samples\PongHostModel.cs" />
+    <Compile Include="Samples\PongModel.cs" />
+    <Compile Include="Samples\PrimitiveBatch.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SMemAppender.cs" />
     <Compile Include="Messages\SMessage.cs" />
+    <Compile Include="SNetConnector.cs" />
     <Compile Include="SNetProp.cs" />
     <Compile Include="SNetUtil.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestClientModel.cs" />
+    <Compile Include="TestHostModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Open.Nat">
+      <HintPath>..\packages\Open.NAT.2.0.5.0\lib\net45\Open.Nat.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll</HintPath>
