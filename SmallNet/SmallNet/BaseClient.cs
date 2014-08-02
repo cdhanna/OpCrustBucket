@@ -143,12 +143,13 @@ namespace SmallNet
             try
             {
                 this.clientModel.destroy();
-                this.netReader.Close();
+                
                 if (notify)
                 {
                     this.sendMessage(new Messages.DisconnectionMessage(this));
                 }
                 this.recieverThread.Abort();
+                this.netReader.Close();
                 this.connected = false;
                 
                 log.Debug("disconnect");
