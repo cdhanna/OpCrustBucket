@@ -17,8 +17,7 @@ namespace SmallNet
         // support additional data structures (list, hash, etc)
         // generics
         // checking for null values on serialize and deserialize
-        // rewrite the check for LHS and RHS tags to only match the entire sequence (so that individual characters of the tag
-            // can be used in strings
+
     class Serializer
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -32,7 +31,8 @@ namespace SmallNet
         protected const string LHS = "{<<";
         protected const string RHS = ">>}";
         protected const string SEP = "::";
-        protected static bool flag = false;
+        protected const string STRHDR = "/S/";
+        protected static bool flag = false; // move into writeLine() eventually?
         protected enum DATASTRUCTURES {NONE, ARRAY};
 
         //default constructor
@@ -43,7 +43,7 @@ namespace SmallNet
         public static String serialize(Object obj)
         {
             String str = writeHeader(obj);
-            str += writeLine(obj, 0);
+            str += writeLine(obj); // recursively builds entire message
             str += completeMsg();
             return str;
         }
@@ -61,21 +61,32 @@ namespace SmallNet
 
             return supFields;
         }
-        private static string writeLine(object obj, int layer)
+        private static string writeLine(object obj)
         {
+            String str = ""; // begin with empty string
             Type data = obj.GetType();
-            String tbs = "";
-            String str = "";
-            List<FieldInfo> bFields = getBaseFields(obj);
+            List<FieldInfo> bFields = getBaseFields(obj); // get super fields
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
-            fields.AddRange(bFields);
+            fields.AddRange(bFields); // combine super fields with fields at this level
             foreach (FieldInfo f in fields)
             {
-                str += tbs + LHS;
+                str += LHS;
                 if (f.FieldType.IsPrimitive || f.FieldType.Equals(typeof(String)))
                 {
-                    // may need to add support for null values
-                    str += (f.FieldType.ToString() + SEP + f.Name + SEP + f.GetValue(obj).ToString() + RHS);
+                    // don't write nulls
+                    if (f.GetValue(obj) != null)
+                    {
+                        str += (f.FieldType.ToString() + SEP + f.Name + SEP);
+                        if (f.FieldType.Equals(typeof(String)))
+                        {
+                            str += STRHDR;
+                            str += f.GetValue(obj).ToString().Length;
+                            str += STRHDR;
+                        }
+                        
+                        str += f.GetValue(obj).ToString();
+                        str += RHS;
+                    }
                 }
 
                 else if (f.FieldType.IsArray)
@@ -92,28 +103,18 @@ namespace SmallNet
                             flag = true;
                             str += (LHS + element.GetType().ToString() );
                         }    
-                        str += writeLine(element,layer);
-                        str += flag ? (RHS ) : "";
+                        str += writeLine(element);
+                        str += flag ? RHS : "";
                         flag = false;
                     }
-                    str += (tbs + RHS);
+                    str += RHS;
                 }
-                else if (f.FieldType.IsSerializable)
-                {
-                    str += ("We don't know what to do with this, but its serializable!" + SEP);
-                    // MSDN example code. Not sure this really serialized the data (how could it??)
-                    //  PLACEHOLDER CODE
-                    //IFormatter form = new BinaryFormatter();
-                    //string streamdata = "datastuff.data";
-                    //FileStream fs = new FileStream(streamdata, FileMode.Create);
-                    //form.Serialize(fs, f.GetValue(obj));
-                    //fs.Close();
-                }
-                else
+
+                else // its an object that needs its own call to writeLine()
                 {
                     str += (f.FieldType.ToString() + SEP + f.Name);
-                    str += writeLine(f.GetValue(obj),layer + 1);
-                    str += (tbs + RHS);
+                    str += writeLine(f.GetValue(obj));
+                    str += RHS;
                 }
             }
 
@@ -122,15 +123,19 @@ namespace SmallNet
         }
         public static Object deserialize(String str)
         {
+            // Figure out type of object needed and instantiate a blank one.
             Type t = getObjType(str);
             ConstructorInfo c = t.GetConstructor(new Type[] { });
             Object obj = c.Invoke(new object[] { });
+
+            // Populate the newly instantiated blank onject with the data from the message.
             deserialize(str, obj);
             return obj;
         }
 
         public static void deserialize(String str, Object obj)
         {
+            // Determine syntax for header, delimiters, etc
             String left, right, delim;
             string header = str.Substring(str.IndexOf(HEADBEG), str.IndexOf(HEADEND) + HEADEND.Length);
             int l = header.IndexOf(LHSIDSTR) + LHSIDSTR.Length;
@@ -141,16 +146,18 @@ namespace SmallNet
             right = header.Substring(r, s-r - SEPIDSTR.Length);
             delim = header.Substring(s, e-s);
 
+            // Get the body of the message, and if it isn't empty, write the values into the object shell.
             string body = str.Substring(str.IndexOf(HEADEND) + HEADEND.Length);
             if (body.Length != MSGEND.Length)
             {
                 body = body.Substring(0, body.Length - MSGEND.Length);
-                writeVal(body, obj, left, right, delim);
+                writeVal(body, obj, left, right, delim); // recursively does all the work.
             }
         }
 
         private static string writeHeader(object obj)
         {
+            // Provides book keeping data for the message.
             string str = "";
             str += HEADBEG
                 + OBJTYPE + obj.GetType().ToString()
@@ -181,38 +188,24 @@ namespace SmallNet
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
             List<FieldInfo> bFields = getBaseFields(obj);
             fields.AddRange(bFields);
+
+            // this separate list just for names might be bloated. Can we get this info efficiently from the fields list?
             List<string> fieldList = new List<string>(fields.Count);
             foreach (FieldInfo f in fields)
             {
                 fieldList.Add(f.Name);
             }
-            string str = getNextObj(msg, left, right, delim);
+            string str = getNextObj(msg, left, right);
             
             while ( str.Length != 0)
             {
                 string[] pieces = str.Split((left + delim).ToCharArray());
                 List<string> p = pieces.ToList<string>();
+                p = splitIntoFields(str,delim);
 
-                int idx = 0;
-                while (idx < p.Count)
-                {
-                    if (p[idx].Length == 0)
-                    {
-                        p.Remove(p[idx]);
-                    }
-                    else
-                    {
-                        idx++;
-                    }
-                }
-               // pieces = p.ToArray();
                 int index = 0;
-                //if (pieces[0] == "")
-                //{
-                  //  index = 1;
-                //}
                 string type = p[index];
-                type = type.Replace(left,"");
+                //type = type.Replace(left,"");
                 int datStructType = isDataStruct(type);
                 string name = p[index+1];
                 switch (datStructType)
@@ -247,7 +240,7 @@ namespace SmallNet
                                             str = str.Substring(1);
                                             str = str.Substring(str.IndexOf(left));
                                             str = str.Insert(0, left);
-                                            str = getNextObj(str, left, right, delim);
+                                            str = getNextObj(str, left, right);
                                             writeVal(str, arr.GetValue(i), left, right, delim);
                                             str = msg.Substring(msg.IndexOf(str) + str.Length + right.Length);
                                         }
@@ -264,11 +257,15 @@ namespace SmallNet
                                 FieldInfo f = fields[x];
                                 if (f.Name.Equals(name))
                                 {
-                                    Type t = f.FieldType;// f.GetValue(obj).GetType(); 
+                                    Type t = f.FieldType; 
                                     if (t.IsPrimitive || t.Equals(typeof(string)))
                                     {
                                         string val = p[index+2];
                                         val = val.Replace(right, "");
+                                        //if (t.Equals(typeof(string)))
+                                        //{
+                                        //    val = stripStringHeader(val);
+                                        //}
                                         f.SetValue(obj, Convert.ChangeType(val, t));
                                         break;
                                     }
@@ -284,11 +281,12 @@ namespace SmallNet
                         }
                 }
                
-                    msg = msg.Substring(1, msg.Length - 1);
+                    //msg = msg.Substring(1, msg.Length - 1);
+                    msg = msg.Substring(str.Length + left.Length + right.Length);
                     if (msg.IndexOf(left) != -1)
                     {
-                        msg = msg.Substring(msg.IndexOf(left));
-                        str = getNextObj(msg, left, right, delim);
+                        //msg = msg.Substring(msg.IndexOf(left));
+                        str = getNextObj(msg, left, right);
                     }
                     else
                     {
@@ -298,22 +296,76 @@ namespace SmallNet
             }
         }
 
-        private static string getNextObj(string msg, string left, string right, string delim)
+        private static string getNextObj(string msg, string left, string right)
         {
             // probably crimminally inefficient. Try pulling all LHS and RHS indeces and then
             // applying some logic instead of scanning char by char.
             int begin = msg.IndexOf(left);
             int balance = 1;
             int i = begin;
-            while (++i< msg.Length && balance != 0)
+            while (++i < msg.Length && balance != 0)
             {
                 string str = msg.Substring(i, left.Length);
+
+                if (str.Equals(STRHDR))
+                {
+                    String str2 = msg.Substring(i + STRHDR.Length);
+                    int chop = str2.IndexOf(STRHDR);
+                    int skip = Convert.ToInt32(str2.Substring(0,chop));
+                    i += (2 * STRHDR.Length + skip);
+                }
                 if (str.CompareTo(left) == 0)
                     balance++;
                 else if (str.Equals(right))
                     balance--;
             }
             return msg.Substring(begin+left.Length,i-begin-right.Length-1); // removes LHS and some?? of RHS
+        }
+
+        private static String stripStringHeader(String msg)
+        {
+            msg = msg.Substring(msg.IndexOf(STRHDR) + STRHDR.Length);
+            return msg.Substring(msg.IndexOf(STRHDR)+STRHDR.Length);
+            
+        }
+
+        private static int skipStringHeader(String msg)
+        {
+            String str = msg.Substring(STRHDR.Length);
+            int chop = str.IndexOf(STRHDR);
+            return Convert.ToInt32(str.Substring(0, chop));
+           
+        }
+
+        private static List<String> splitIntoFields(String msg,String delim)
+        {
+            List<String> fields = new List<String>();
+            String f;
+            while (msg.Length != 0)
+            {
+                if ( msg.IndexOf(STRHDR) >= 0 &&  msg.Substring(0, STRHDR.Length).Equals(STRHDR))
+                {
+                    int len = skipStringHeader(msg);
+                    msg = msg.Substring(STRHDR.Length);
+                    msg = msg.Substring(msg.IndexOf(STRHDR) + STRHDR.Length);
+                    f = msg.Substring(0, len);
+                }
+                else
+                {
+                    if (msg.IndexOf(delim) > 0)
+                        f = msg.Substring(0, msg.IndexOf(delim));
+                    else
+                        f = msg;
+                }
+                fields.Add(f);
+                msg = msg.Substring(f.Length);
+                if (msg.Length != 0)
+                {
+                    msg = msg.Substring(delim.Length);
+                }
+            }
+            return fields;
+
         }
         
         private static int isDataStruct(string type)
