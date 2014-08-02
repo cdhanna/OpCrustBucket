@@ -24,6 +24,9 @@ namespace SmallNet
             //SimpleNetTest test = new SimpleNetTest();
             using (var game = new Test())
                 game.Run();
+
+            //SNetConnector snc = new SNetConnector();
+
         }
     }
 #endif

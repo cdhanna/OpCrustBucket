@@ -1,6 +1,6 @@
 ﻿namespace SmallNet.DebugSession
 {
-    partial class DebugForm<T> where T:ClientModel
+    partial class DebugForm<T, H> where T:ClientModel where H:HostModel<T>
     {
         /// <summary>
         /// Required designer variable.

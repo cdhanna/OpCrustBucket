@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace SmallNet
 {
    
-    public class BaseHost<T> : Id where T:ClientModel
+    public class BaseHost<T, H> : Id where T:ClientModel where H :HostModel<T>
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -21,11 +21,14 @@ namespace SmallNet
         private Thread clientAcceptorThread;
         private bool clientAcceptorThreadRunner;
         
-        private NetModel<T> model;
+        //private NetModel<T> model;
+
+        private H hostModel;
+
         public Boolean Debug { get; set; }
         public string IpAddress { get { return this.ipAddress; } }
 
-        public NetModel<T> Model { get { return this.model; } }
+        public H Model { get { return this.hostModel; } }
         private bool isRunning;
         public bool IsRunning { get { return this.isRunning; } }
 
@@ -35,11 +38,20 @@ namespace SmallNet
 
         public BaseHost()
         {
-            this.model = new NetModel<T>();
-           
-            this.ipAddress = SNetUtil.getLocalIp();
-            this.tcpListener = new TcpListener(IPAddress.Parse(this.ipAddress), SNetProp.getPort());
+            //this.model = new NetModel<T>();
+            this.hostModel = (H)typeof(H).GetConstructor(new Type[] { }).Invoke(new object[] { });
+            this.hostModel.init();
+            //this.clientModel.create(this.netWriter, "host");
 
+
+
+            this.tcpListener = new TcpListener(IPAddress.Parse("0.0.0.0"), SNetProp.getPort());
+          //  this.tcpListener = new TcpListener("0.0.0.0", SNetProp.getPort());
+            //this.tcpListener.AllowNatTraversal(true);
+           
+           // IPEndPoint ep = new IPEndPoint(ip, SNetProp.getPort());
+
+            //new TcpListener(
         }
 
         public void start()
@@ -52,13 +64,18 @@ namespace SmallNet
                 {
                     while (clientAcceptorThreadRunner)
                     {
+                        Console.WriteLine("waiting for connection form a client");
                         //accept a new client
+                       // TcpClient tc =  tcpListener.AcceptTcpClient();
+
+
+
                         Socket socket = tcpListener.AcceptSocket();
                         //create clientProxy, which puts it into the model
-                        
-                       // BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model, 0);
-                        BaseClientProxy<T> client = this.model.generateNewClient(socket);
-                        this.model.addClient(client);
+
+                        // BaseClientProxy<T> client = new BaseClientProxy<T>(socket, model, 0);
+                        BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);
+                        this.hostModel.addClient(client);
                         client.sendMessage(new Messages.CreateNewModelMessage(this, client.Id));
                         client.Debug = Debug;
                         log.Debug("got a connection");
@@ -70,11 +87,11 @@ namespace SmallNet
                     log.Debug("client acceptor thread has stopped... " + e.Message);
                 }
             });
-
+this.clientAcceptorThread.Start();
             this.clientAcceptorThreadRunner = true;
             this.tcpListener.Start();
             this.clientAcceptorThread.Name = "HOST:CLIENTACCEPTER";
-            this.clientAcceptorThread.Start();
+            
             isRunning = true;
             this.fireConnectedEvent();
 
@@ -109,12 +126,12 @@ namespace SmallNet
 
         public void sendMessageToAll(SMessage message)
         {
-            this.model.sendMessageToAll(message);
+            this.hostModel.sendMessageToAll(message);
         }
 
         public void update(GameTime time)
         {
-            this.model.update(time);
+            this.hostModel.update(time);
         }
     }
 }

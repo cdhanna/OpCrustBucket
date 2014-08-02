@@ -5,13 +5,13 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_StopHost<T> : CommandOption<T> where T:ClientModel
+    class Command_StopHost<T, H> : CommandOption<T, H> where T:ClientModel where H:HostModel<T>
     {
         public Command_StopHost() : base("Stop Host")
         {
         }
 
-        public override String runCommand(DebugSession<T> debug, String[] paramString)
+        public override String runCommand(DebugSession<T, H> debug, String[] paramString)
         {
             if (debug.Host == null)
             {

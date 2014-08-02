@@ -18,7 +18,7 @@ namespace SmallNet
         }
         public SMessage() {
            // time = SNetUtil.getCurrentTime();
-           // this.senderId = -1;
+            this.senderId = -1;
         }
 
         public long TimeSent { get { return this.time; } }

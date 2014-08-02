@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    public abstract class CommandOption<T> where T:ClientModel
+    public abstract class CommandOption<T, H> where T:ClientModel where H:HostModel<T>
     {
 
         private String name;
@@ -21,7 +21,7 @@ namespace SmallNet.DebugSession
             return this.name;
         }
 
-        public abstract String runCommand(DebugSession<T> debug, String[] paramString);
+        public abstract String runCommand(DebugSession<T, H> debug, String[] paramString);
         public abstract String getParamDescription();
         
         

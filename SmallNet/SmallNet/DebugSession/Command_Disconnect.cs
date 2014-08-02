@@ -5,14 +5,16 @@ using System.Text;
 
 namespace SmallNet.DebugSession
 {
-    class Command_Disconnect<T> : CommandOption<T> where T : ClientModel
+    class Command_Disconnect<T, H> : CommandOption<T, H>
+        where T : ClientModel
+        where H : HostModel<T>
     {
         public Command_Disconnect()
             : base("Disconnect")
         {
         }
 
-        public override string runCommand(DebugSession<T> debug, string[] paramString)
+        public override string runCommand(DebugSession<T, H> debug, string[] paramString)
         {
             if (debug.Client == null)
             {

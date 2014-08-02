@@ -62,14 +62,17 @@ namespace SmallNet
         public abstract void destroy();
 
         public abstract bool validateMessage(SMessage message);
-        public virtual void onMessage(SMessage message)
+
+
+        public void onMessage(SMessage message)
         {
             if (messageRecieved != null)
             {
                 MessageRecieved(this, new MessageEventArgs(message));
             }
+            this.gotMessage(message);
         }
-
+        protected abstract void gotMessage(SMessage message);
 
 
         public virtual void sendMessage(SMessage message)
