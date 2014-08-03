@@ -27,6 +27,7 @@ namespace SmallNet.Samples.BasicMove
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont font;
         PrimitiveBatch prim;
         Camera2D camera;
 
@@ -75,9 +76,6 @@ namespace SmallNet.Samples.BasicMove
             client.connectTo(ip, userName);
 
 
-            BaseClient<BasicClientModel> other = new BaseClient<BasicClientModel>();
-            other.connectTo(ip, "other");
-
             this.IsFixedTimeStep = true;
             this.TargetElapsedTime = TimeSpan.FromMilliseconds(20);
 
@@ -92,7 +90,7 @@ namespace SmallNet.Samples.BasicMove
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Console.WriteLine("load");
+            font = Content.Load<SpriteFont>("font");
             // TODO: use this.Content to load your game content here
         }
 
@@ -133,7 +131,7 @@ namespace SmallNet.Samples.BasicMove
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            client.ClientModel.draw(prim);
+            client.ClientModel.draw(prim, spriteBatch, font);
 
             base.Draw(gameTime);
         }

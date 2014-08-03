@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using SmallNet;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 
 namespace SmallNet.Samples.BasicMove
 {
@@ -113,20 +115,20 @@ namespace SmallNet.Samples.BasicMove
             if (id == Id)
             {
                 //I joined!!!
-                me = new BasicPlayer(new Vector2(200, 200));
+                me = new BasicPlayer(id, new Vector2(200, 200));
                 this.addPlayer(id, me);
             }
             else
             {
                 //some one else joined!
-                BasicPlayer other = new BasicPlayer(new Vector2(200, 200));
+                BasicPlayer other = new BasicPlayer(id, new Vector2(200, 200));
                 this.addPlayer(id, other);
             }
         }
 
-        public void draw(PrimitiveBatch prim)
+        public void draw(PrimitiveBatch prim, SpriteBatch spr, SpriteFont font)
         {
-            doForAllPlayers((plr) => { plr.draw(prim); });
+            doForAllPlayers((plr) => { plr.draw(prim, spr, font); });
            // netman.draw(prim);
         }
 
