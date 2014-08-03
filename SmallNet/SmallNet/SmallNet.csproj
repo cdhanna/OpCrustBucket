@@ -100,14 +100,11 @@
     <Compile Include="Messages\DisconnectionMessage.cs" />
     <Compile Include="Messages\StringMessage.cs" />
     <Compile Include="NetModel.cs" />
-    <Compile Include="Samples\BallMoveMessage.cs" />
+    <Compile Include="Samples\BasicMove\BasicClientModel.cs" />
+    <Compile Include="Samples\BasicMove\BasicGame.cs" />
+    <Compile Include="Samples\BasicMove\BasicHostModel.cs" />
     <Compile Include="Samples\Camera2D.cs" />
-    <Compile Include="Samples\ChangeBallVelMessage.cs" />
     <Compile Include="Samples\KeyboardHelper.cs" />
-    <Compile Include="Samples\PaddleMoveMessage.cs" />
-    <Compile Include="Samples\PongGame.cs" />
-    <Compile Include="Samples\PongHostModel.cs" />
-    <Compile Include="Samples\PongModel.cs" />
     <Compile Include="Samples\PrimitiveBatch.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="SMemAppender.cs" />

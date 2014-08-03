@@ -14,7 +14,7 @@ namespace SmallNet
         private Dictionary<int, BaseClientProxy<T>> clientIdTable;
         public int ClientProxyCount { get { return this.clients.Count; } }
 
-        int clientIdIncer = SNetProp.HOST_ID + 1;
+        int clientIdIncer = SNetProp.HOST_ID ;
 
 
         public BaseClientProxy<T> getClientProxy(int index)
@@ -30,9 +30,10 @@ namespace SmallNet
 
         public BaseClientProxy<T> generateNewClient(Socket socket)
         {
+            clientIdIncer++;
             BaseClientProxy<T> client = new BaseClientProxy<T>(socket, this, clientIdIncer);
             this.clientIdTable[clientIdIncer] = client;
-            clientIdIncer++;
+            
             return client;
         }
 
