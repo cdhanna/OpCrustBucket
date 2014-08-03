@@ -74,8 +74,8 @@ namespace SmallNet.Samples.BasicMove
             client = new BaseClient<BasicClientModel>();
             client.connectTo(ip, userName);
 
-            
-
+            this.IsFixedTimeStep = true;
+            this.TargetElapsedTime = TimeSpan.FromMilliseconds(20);
 
             base.Initialize();
         }
