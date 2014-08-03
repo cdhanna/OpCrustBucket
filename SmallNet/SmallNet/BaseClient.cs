@@ -210,7 +210,7 @@ namespace SmallNet
                     NewModel(this, new EventArgs());
                 }
                 this.connected = true;
-                this.clientModel.playerJoined(this.id);
+                //this.clientModel.playerJoined(this.id);
 
                 this.fireConnected();
             }

@@ -40,10 +40,10 @@ namespace SmallNet
             SNetUtil.configureStreams(netReader, netWriter);
 
             this.model = model;
-
+            
             this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
             this.clientModel.create(this.netWriter, "host");
-
+            clientModel.setId(id);
             this.startRecieverThread();
         }
 
@@ -65,7 +65,7 @@ namespace SmallNet
 
         public void playerJoined(Id id)
         {
-            
+         
             clientModel.playerJoined(id.Id);
             this.sendMessage(new Messages.PlayerJoined(id));
         }

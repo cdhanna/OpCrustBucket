@@ -69,9 +69,10 @@ namespace SmallNet
                         //create clientProxy, which puts it into the model
 
                         BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);
-                        
                         client.sendMessage(new Messages.CreateNewModelMessage(this, client.Id));
                         this.hostModel.addClient(client);
+                        
+                        //client.playerJoined(client);
                         //client.sendMessage(new Messages.PlayerJoined(client));
                         client.Debug = Debug;
                         log.Debug("got a connection");

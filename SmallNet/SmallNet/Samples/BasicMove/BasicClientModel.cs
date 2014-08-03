@@ -22,8 +22,7 @@ namespace SmallNet.Samples.BasicMove
         public override void init()
         {
             Console.WriteLine("Client starting");
-            me = new BasicPlayer(new Vector2(200, 200));
-
+           
             playerMap = new Dictionary<int, BasicPlayer>();
             playerIds = new List<int>();
 
@@ -109,6 +108,8 @@ namespace SmallNet.Samples.BasicMove
 
         public override void playerJoined(int id)
         {
+            Console.WriteLine(Owner + " : " + Id + " PLAYER JOIN: " + id);
+
             if (id == Id)
             {
                 //I joined!!!

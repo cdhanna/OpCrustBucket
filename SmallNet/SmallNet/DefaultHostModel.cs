@@ -33,21 +33,34 @@ namespace SmallNet
             clientIdIncer++;
             BaseClientProxy<T> client = new BaseClientProxy<T>(socket, this, clientIdIncer);
             this.clientIdTable[clientIdIncer] = client;
-            
+
             return client;
         }
 
 
         public void addClient(BaseClientProxy<T> client)
         {
-            
-            
-            this.clients.Add(client);
 
+            //tell the new client about all the existing clients
             foreach (BaseClientProxy<T> proxy in this.clients)
             {
+                client.playerJoined(proxy);
+            }
+
+
+            this.clients.Add(client);
+
+
+            //tell the clients about the new client
+            foreach (BaseClientProxy<T> proxy in this.clients)
+            {
+           
                 proxy.playerJoined(client);
             }
+
+            
+
+            
 
 
         }
