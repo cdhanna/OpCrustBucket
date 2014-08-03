@@ -26,24 +26,46 @@ namespace SmallNet.Samples.BasicMove
 
         public override void update(Microsoft.Xna.Framework.GameTime time)
         {
-            if (keyboard.KeyDown(Microsoft.Xna.Framework.Input.Keys.D))
+            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
             {
-                this.sendMessage(new PosMessage(this, 1 + (int)me.Position.X, (int)me.Position.Y));
+                this.sendMessage(new MsgVelocityChange(this, 1, 0));
             }
-            if (keyboard.KeyDown(Microsoft.Xna.Framework.Input.Keys.A))
+            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
             {
-                this.sendMessage(new PosMessage(this, -1 + (int)me.Position.X, (int)me.Position.Y));
+                this.sendMessage(new MsgVelocityChange(this, -1, 0));
             }
-            if (keyboard.KeyDown(Microsoft.Xna.Framework.Input.Keys.W))
+            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
             {
-                this.sendMessage(new PosMessage(this, (int)me.Position.X, -1 + (int)me.Position.Y));
+                this.sendMessage(new MsgVelocityChange(this, 0, -1));
             }
-            if (keyboard.KeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
             {
-                this.sendMessage(new PosMessage(this, (int)me.Position.X, 1 + (int)me.Position.Y));
+                this.sendMessage(new MsgVelocityChange(this, 0, 1));
+            }
+
+
+            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.D))
+            {
+                this.sendMessage(new MsgVelocityChange(this, 0, 0));
+            }
+            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.A))
+            {
+                this.sendMessage(new MsgVelocityChange(this, 0, 0));
+            }
+            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.W))
+            {
+                this.sendMessage(new MsgVelocityChange(this, 0, 0));
+            }
+            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.S))
+            {
+                this.sendMessage(new MsgVelocityChange(this, 0, 0));
             }
 
             this.keyboard.Update();
+
+
+            me.update();
+            netman.update();
         }
 
         public override void destroy()
@@ -58,19 +80,20 @@ namespace SmallNet.Samples.BasicMove
 
         protected override void gotMessage(SMessage message)
         {
-            if (Id != 0)
+            if (message.SenderId != 0)
             {
-                if (message is PosMessage)
+                if (message is MsgVelocityChange)
                 {
-                    PosMessage msg = (PosMessage)message;
+                    MsgVelocityChange msg = (MsgVelocityChange)message;
 
                     if (msg.SenderId == Id)
                     {
-                        me.Position = new Vector2(msg.getX(), msg.getY());
+                        me.Velocity = new Vector2(msg.X, msg.Y);
                     }
                     else
                     {
-                        netman.Position = new Vector2(msg.getX(), msg.getY());
+                       // Console.WriteLine(msg.SenderId);
+                        netman.Velocity = new Vector2(msg.X, msg.Y);
                     }
                 }
             }

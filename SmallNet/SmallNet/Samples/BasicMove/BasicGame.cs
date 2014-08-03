@@ -47,7 +47,7 @@ namespace SmallNet.Samples.BasicMove
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            prim = new PrimitiveBatch(GraphicsDevice);
+           
             camera = new Camera2D(new Vector2(800, 600));
         }
 
@@ -59,6 +59,10 @@ namespace SmallNet.Samples.BasicMove
         /// </summary>
         protected override void Initialize()
         {
+
+            prim = new PrimitiveBatch(GraphicsDevice);
+
+
             if (isHost) //we are running the host threads!!!
             {
                 host = new BaseHost<BasicClientModel, BasicHostModel>();

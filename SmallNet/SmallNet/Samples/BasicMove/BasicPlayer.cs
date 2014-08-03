@@ -12,18 +12,26 @@ namespace SmallNet.Samples.BasicMove
     {
 
         private Vector2 pos;
+        private Vector2 vel;
         private float size = 50;
 
         public BasicPlayer(Vector2 startPos)
         {
             this.pos = startPos;
+            vel = Vector2.Zero;
         }
 
 
         public Vector2 Position { get { return pos; } set { pos = value; } }
+        public Vector2 Velocity { get { return vel; } set { vel = value; } }
 
 
         //////
+
+        public void update()
+        {
+            pos += vel;
+        }
 
         public void draw(PrimitiveBatch prim)
         {
