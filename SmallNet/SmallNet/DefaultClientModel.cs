@@ -63,6 +63,7 @@ namespace SmallNet
 
         public abstract bool validateMessage(SMessage message);
 
+        public abstract void playerJoined(int id);
 
         public void onMessage(SMessage message)
         {

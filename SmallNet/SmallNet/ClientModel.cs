@@ -28,5 +28,6 @@ namespace SmallNet
         void onMessage(SMessage message);
         void sendMessage(SMessage message);
         void sendMessage(String rawMessage);
+        void playerJoined(int id);
     }
 }

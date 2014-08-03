@@ -38,5 +38,10 @@ namespace SmallNet
         {
             log.Debug(this.Owner + " : onMessage " + message);
         }
+
+        public override void playerJoined(int id)
+        {
+            
+        }
     }
 }

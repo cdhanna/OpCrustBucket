@@ -98,6 +98,7 @@
     <Compile Include="Messages\ConnectionMessage.cs" />
     <Compile Include="Messages\CreateNewModelMessage.cs" />
     <Compile Include="Messages\DisconnectionMessage.cs" />
+    <Compile Include="Messages\PlayerJoined.cs" />
     <Compile Include="Messages\StringMessage.cs" />
     <Compile Include="NetModel.cs" />
     <Compile Include="Samples\BasicMove\BasicClientModel.cs" />

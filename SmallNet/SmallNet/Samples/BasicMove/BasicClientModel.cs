@@ -12,7 +12,10 @@ namespace SmallNet.Samples.BasicMove
     class BasicClientModel : DefaultClientModel, Id
     {
 
-        private BasicPlayer me, netman;
+        private Dictionary<int, BasicPlayer> playerMap;
+        private List<int> playerIds;
+
+        private BasicPlayer me;
 
         private KeyboardHelper keyboard;
 
@@ -20,8 +23,19 @@ namespace SmallNet.Samples.BasicMove
         {
             Console.WriteLine("Client starting");
             me = new BasicPlayer(new Vector2(200, 200));
-            netman = new BasicPlayer(new Vector2(200, 200));
+
+            playerMap = new Dictionary<int, BasicPlayer>();
+            playerIds = new List<int>();
+
+           
+
             keyboard = new KeyboardHelper();
+        }
+
+        public void addPlayer(int id, BasicPlayer player)
+        {
+            playerIds.Add(id);
+            playerMap[id] = player;
         }
 
         public override void update(Microsoft.Xna.Framework.GameTime time)
@@ -64,8 +78,9 @@ namespace SmallNet.Samples.BasicMove
             this.keyboard.Update();
 
 
-            me.update();
-            netman.update();
+            doForAllPlayers((plr) => { plr.update(); });
+
+
         }
 
         public override void destroy()
@@ -85,30 +100,43 @@ namespace SmallNet.Samples.BasicMove
                 if (message is MsgVelocityChange)
                 {
                     MsgVelocityChange msg = (MsgVelocityChange)message;
-
-                    if (msg.SenderId == Id)
-                    {
-                        me.Velocity = new Vector2(msg.X, msg.Y);
-                    }
-                    else
-                    {
-                       // Console.WriteLine(msg.SenderId);
-                        netman.Velocity = new Vector2(msg.X, msg.Y);
-                    }
+                    //Console.WriteLine(SNetUtil.getCurrentTime() + " : " + msg.SenderId + " : " + this.playerMap.ContainsKey(msg.SenderId));
+                    playerMap[msg.SenderId].Velocity = new Vector2(msg.X, msg.Y);
                 }
             }
             
         }
 
-
+        public override void playerJoined(int id)
+        {
+            if (id == Id)
+            {
+                //I joined!!!
+                me = new BasicPlayer(new Vector2(200, 200));
+                this.addPlayer(id, me);
+            }
+            else
+            {
+                //some one else joined!
+                BasicPlayer other = new BasicPlayer(new Vector2(200, 200));
+                this.addPlayer(id, other);
+            }
+        }
 
         public void draw(PrimitiveBatch prim)
         {
-            me.draw(prim);
-            netman.draw(prim);
+            doForAllPlayers((plr) => { plr.draw(prim); });
+           // netman.draw(prim);
         }
 
-
+        delegate void PlayerFunc(BasicPlayer plr);
+        private void doForAllPlayers(PlayerFunc d)
+        {
+            foreach (int player in this.playerIds)
+            {
+                d.Invoke(this.playerMap[player]);
+            }
+        }
 
         int Id.Id
         {

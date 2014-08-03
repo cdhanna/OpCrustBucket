@@ -210,12 +210,17 @@ namespace SmallNet
                     NewModel(this, new EventArgs());
                 }
                 this.connected = true;
+                this.clientModel.playerJoined(this.id);
 
                 this.fireConnected();
             }
             else if (message is Messages.DisconnectionMessage)
             {
                 this.disconnect(false);
+            }
+            else if (message is Messages.PlayerJoined)
+            {
+                this.ClientModel.playerJoined(message.SenderId);
             }
             else
             {

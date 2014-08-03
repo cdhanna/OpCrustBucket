@@ -25,6 +25,8 @@ namespace SmallNet
         private T clientModel;
         private int id;
         public int Id { get { return this.id; } }
+        //public T ClientModel { get { return this.clientModel; } }
+
 
         public BaseClientProxy(Socket socket, HostModel<T> model, int id)
         {
@@ -60,6 +62,14 @@ namespace SmallNet
             
             loop = false;
         }
+
+        public void playerJoined(Id id)
+        {
+            
+            clientModel.playerJoined(id.Id);
+            this.sendMessage(new Messages.PlayerJoined(id));
+        }
+
         bool loop = true;
         private void startRecieverThread()
         {

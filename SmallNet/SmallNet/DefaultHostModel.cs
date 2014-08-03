@@ -40,7 +40,15 @@ namespace SmallNet
 
         public void addClient(BaseClientProxy<T> client)
         {
+            
+            
             this.clients.Add(client);
+
+            foreach (BaseClientProxy<T> proxy in this.clients)
+            {
+                proxy.playerJoined(client);
+            }
+
 
         }
         public void removeClient(BaseClientProxy<T> client)
