@@ -33,8 +33,8 @@ namespace SmallNet.DebugSession
 
         public DebugSession()
         {
-            logWatcher = new LogWatcher();
-            logWatcher.Updated += logWatcher_Updated;
+          //  logWatcher = new LogWatcher();
+          //  logWatcher.Updated += logWatcher_Updated;
 
             this.df = new DebugForm<T, H>(this);
             this.df.addCommandOption(new Command_HostAndClient<T, H>());
