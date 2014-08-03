@@ -41,22 +41,22 @@ namespace SmallNet.DebugSession
 
         public void setLog(String log)
         {
-            //string newText =log; // running on worker thread
-            //try
-            //{
-            //    if (!logBox.IsDisposed && !this.IsDisposed)
-            //    {
-            //        this.Invoke((MethodInvoker)delegate
-            //        {
-            //            logBox.Text = ""; // runs on UI thread
-            //            logBox.AppendText(log); // use append to auto-scroll text box
-            //        });
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("log is disposed and cannot be used");
-            //}
+            string newText = log; // running on worker thread
+            try
+            {
+                if (!logBox.IsDisposed && !this.IsDisposed)
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        logBox.Text = ""; // runs on UI thread
+                        logBox.AppendText(log); // use append to auto-scroll text box
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("log is disposed and cannot be used");
+            }
             
         }
 
