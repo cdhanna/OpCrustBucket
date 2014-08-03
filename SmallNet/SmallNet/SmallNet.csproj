@@ -103,6 +103,8 @@
     <Compile Include="Samples\BasicMove\BasicClientModel.cs" />
     <Compile Include="Samples\BasicMove\BasicGame.cs" />
     <Compile Include="Samples\BasicMove\BasicHostModel.cs" />
+    <Compile Include="Samples\BasicMove\BasicPlayer.cs" />
+    <Compile Include="Samples\BasicMove\PosMessage.cs" />
     <Compile Include="Samples\Camera2D.cs" />
     <Compile Include="Samples\KeyboardHelper.cs" />
     <Compile Include="Samples\PrimitiveBatch.cs" />

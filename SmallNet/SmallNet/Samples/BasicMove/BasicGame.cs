@@ -27,8 +27,9 @@ namespace SmallNet.Samples.BasicMove
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        //BaseHost<TestClientModel> host = new BaseHost<TestClientModel>();
-        //BaseClient<TestClientModel> client = new BaseClient<TestClientModel>();
+        PrimitiveBatch prim;
+        Camera2D camera;
+
 
         string ip = "192.168.1.124";
         string userName = "chris";
@@ -45,6 +46,9 @@ namespace SmallNet.Samples.BasicMove
            
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            prim = new PrimitiveBatch(GraphicsDevice);
+            camera = new Camera2D(new Vector2(800, 600));
         }
 
         /// <summary>
@@ -103,8 +107,12 @@ namespace SmallNet.Samples.BasicMove
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            //client.update(gameTime);
-            //host.update(gameTime);
+            client.update(gameTime);
+            if (host != null)
+                host.update(gameTime);
+
+            prim.setCamera(camera.Translation);
+            camera.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -117,7 +125,7 @@ namespace SmallNet.Samples.BasicMove
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            client.ClientModel.draw(prim);
 
             base.Draw(gameTime);
         }
