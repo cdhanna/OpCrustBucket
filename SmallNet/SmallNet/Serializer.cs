@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-// Add references to Soap and Binary formatters. 
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using System.IO;
-using log4net;
+
 
 namespace SmallNet
 {
@@ -20,7 +17,6 @@ namespace SmallNet
 
     class Serializer
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected const string HEADBEG = "HB";
         protected const string HEADEND = "HE";
         protected const string MSGEND = "ME";
@@ -37,6 +33,7 @@ namespace SmallNet
         {
     
         }
+
         public static String serialize(Object obj)
         {
             String str = writeHeader(obj);
@@ -74,6 +71,8 @@ namespace SmallNet
                     if (f.GetValue(obj) != null)
                     {
                         str += (f.FieldType.ToString() + SEP + f.Name + SEP);
+
+                        // if its a string, need to put a header in front so the deserializer will escape the text
                         if (f.FieldType.Equals(typeof(String)))
                         {
                             str += STRHDR;
@@ -86,11 +85,12 @@ namespace SmallNet
                     }
                 }
 
+                // move this to a seperate function or class eventually for clarity
                 else if (f.FieldType.IsArray)
                 {
                     Array arr = (Array)f.GetValue(obj);
                     string arrayStr = (f.FieldType.ToString() + SEP + f.Name);
-                    int size = arr.Length;
+                    int size = arr.Length; // might need to check for size = 0 / uninitialized arrays
                     arrayStr = arrayStr.Insert(arrayStr.IndexOf("[") + 1, size.ToString());
                     str += arrayStr;
                     foreach (object element in arr)
@@ -162,6 +162,7 @@ namespace SmallNet
             return t;
         }
 
+        // simple for now. Maybe later it will need additional functionality.
         private static string completeMsg()
         {
             return MSGEND;
@@ -184,17 +185,20 @@ namespace SmallNet
             
             while ( str.Length != 0)
             {
+                // this is used when a non-primitive object is being deserialized.
+                // on a primitive or string, the str.split command does nothing.
                 string[] pieces = str.Split((LHS + RHS).ToCharArray());
                 List<string> p = pieces.ToList<string>();
                 p = splitIntoFields(str,SEP);
 
                 int index = 0;
                 string type = p[index];
-                int datStructType = isDataStruct(type);
+                DATASTRUCTURES datStructType = isDataStruct(type);
+               
                 string name = p[index+1];
                 switch (datStructType)
                 {
-                    case  1:
+                    case  DATASTRUCTURES.ARRAY:
                         {
                             int lbrack = type.IndexOf("[");
                             int rbrack = type.IndexOf("]");
@@ -310,7 +314,7 @@ namespace SmallNet
             
         }
 
-        private static int skipStringHeader(String msg)
+        private static int getStringLiteralLength(String msg)
         {
             String str = msg.Substring(STRHDR.Length);
             int chop = str.IndexOf(STRHDR);
@@ -324,9 +328,11 @@ namespace SmallNet
             String f;
             while (msg.Length != 0)
             {
+                // if its the value for a string (2 part check may be over kill?)
                 if ( msg.IndexOf(STRHDR) >= 0 &&  msg.Substring(0, STRHDR.Length).Equals(STRHDR))
                 {
-                    int len = skipStringHeader(msg);
+                    // pull out the literal data of the string
+                    int len = getStringLiteralLength(msg);
                     msg = msg.Substring(STRHDR.Length);
                     msg = msg.Substring(msg.IndexOf(STRHDR) + STRHDR.Length);
                     f = msg.Substring(0, len);
@@ -349,17 +355,18 @@ namespace SmallNet
 
         }
         
-        private static int isDataStruct(string type)
+        private static DATASTRUCTURES isDataStruct(string type)
         {
             // lazy, only does binary check. 
             // LATER should handle any data struct type
+             
             if (type.Length != 0 && type.Substring(type.Length -1,1).CompareTo("]") == 0)
             {
-                return 1;
+                return DATASTRUCTURES.ARRAY;
             }
             else
             {
-                return 0;
+                return DATASTRUCTURES.NONE;
             }
         }
     }
