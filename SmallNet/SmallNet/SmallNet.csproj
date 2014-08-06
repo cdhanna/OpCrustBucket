@@ -100,7 +100,6 @@
     <Compile Include="Messages\DisconnectionMessage.cs" />
     <Compile Include="Messages\PlayerJoined.cs" />
     <Compile Include="Messages\StringMessage.cs" />
-    <Compile Include="NetModel.cs" />
     <Compile Include="NetworkSide.cs" />
     <Compile Include="Samples\BasicMove\BasicClientModel.cs" />
     <Compile Include="Samples\BasicMove\BasicGame.cs" />

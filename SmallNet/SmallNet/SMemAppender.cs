@@ -7,6 +7,9 @@ using log4net.Appender;
 
 namespace SmallNet
 {
+    /// <summary>
+    /// grab log4net output and huck it into memory. HUCK IT.
+    /// </summary>
     public class SMemAppender : MemoryAppender
     {
         public event EventHandler Updated;

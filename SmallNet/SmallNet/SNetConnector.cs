@@ -10,6 +10,10 @@ using System.IO;
 
 namespace SmallNet
 {
+
+    /// <summary>
+    /// work in progress class that will eventually connect to smallport and retrieve listings of suitable Smallnet sessions to join.
+    /// </summary>
     class SNetConnector
     {
 

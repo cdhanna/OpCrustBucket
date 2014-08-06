@@ -10,35 +10,37 @@ using log4net;[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace SmallNet
 {
+
+    /// <summary>
+    /// A collection of SmallNet utility functions
+    /// </summary>
     class SNetUtil
     {
-
+        /// <summary>
+        /// log object
+        /// </summary>
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+
+        /// <summary>
+        /// configure streams to best performance. 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="writer"></param>
         public static void configureStreams(StreamReader reader, StreamWriter writer)
         {
            // writer.AutoFlush = true;
-            
+            //do something with streams? maybe
         }
 
         /// <summary>
         /// Encode a message type with parameters.
-        /// the final encored message will look like this
-        /// MSGTYPE {ARG1} {ARG2} {ARGn}
-        /// The {ARG}s will be toString'd
-        /// If you put this on a stream, remember to write the variables to it.
-        /// netWriter.WriteLine(msg, parameters);
         /// </summary>
         /// <param name="msgType"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
         public static string encodeMessage(SMessage smessage)
         {
-            //string msg = msgType + " ";
-            //for (int i = 0; i < parameters.Length; i++)
-            //{
-            //    msg += "{" + i + "} ";
-            //}
             log.Debug("ENCODING MESSAGE : " + smessage.ToString());
             string msg = Serializer.serialize(smessage);
             return msg;
@@ -46,7 +48,6 @@ namespace SmallNet
 
         /// <summary>
         /// Decode a message into a type and parameters
-        /// you will get back a tuple, where the first item is the message type, and the second item is an array of 
         /// serialized paramters
         /// </summary>
         /// <param name="message"></param>
@@ -56,15 +57,7 @@ namespace SmallNet
 
             log.Debug("DECODING MESSAGE : " + message);
             SMessage smess = (SMessage)Serializer.deserialize(message);
-            //string receivedMsg = message;
-            //string[] msg = receivedMsg.Split(' ');
-            //string[] param = new string[msg.Length - 1];
-            //for (int i = 0; i < msg.Length - 1; i++)
-            //{
-            //    param[i] = msg[i + 1];
-            //}
-            
-            //Tuple<string, string[]> retValue = new Tuple<string, string[]>(msg[0], param);
+           
             return smess;
         }
 
@@ -120,18 +113,15 @@ namespace SmallNet
             return networkIPs;
         }
 
+        /// <summary>
+        /// Get the current system time since the epoch. 
+        /// NOTE: this time will not be consistent accross machines.
+        /// </summary>
+        /// <returns></returns>
         public static long getCurrentTime()
         {
-            //return (long)DateTime.UtcNow.Millisecond;
            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
         }
 
-        public T createClientModel<T>(StreamWriter netWriter, NetworkSide owner) where T : ClientModel 
-        {
-            //create a new client model
-            T clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            clientModel.create(netWriter, owner);
-            return clientModel;
-        }
     }
 }
