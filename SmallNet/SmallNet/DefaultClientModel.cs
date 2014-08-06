@@ -16,7 +16,7 @@ namespace SmallNet
 
 
 
-        private string name;
+        private NetworkSide name;
         private System.Timers.Timer timer;
         private StreamWriter netWriter;
         private int id;
@@ -34,9 +34,9 @@ namespace SmallNet
             get;
             set;
         }
-        public string Owner { get{ return this.name;} }
+        public NetworkSide Owner { get{ return this.name;} }
         public int Id { get { return this.id; } }
-        public void create(StreamWriter netWriter, string owner)
+        public void create(StreamWriter netWriter, NetworkSide owner)
         {
             this.TargetTime = 30;
             this.name = owner;

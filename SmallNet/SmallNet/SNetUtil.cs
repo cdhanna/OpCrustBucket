@@ -126,7 +126,7 @@ namespace SmallNet
            return (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
         }
 
-        public T createClientModel<T>(StreamWriter netWriter, string owner) where T : ClientModel 
+        public T createClientModel<T>(StreamWriter netWriter, NetworkSide owner) where T : ClientModel 
         {
             //create a new client model
             T clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });

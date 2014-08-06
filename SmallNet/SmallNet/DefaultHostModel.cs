@@ -93,7 +93,7 @@ namespace SmallNet
         {
             foreach (BaseClientProxy<T> proxy in this.clients)
             {
-                //proxy.update(time);
+                proxy.update(time);
             }
             this.updateHost(time);
         }

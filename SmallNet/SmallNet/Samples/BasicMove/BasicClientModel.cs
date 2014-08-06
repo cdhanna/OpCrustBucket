@@ -39,43 +39,52 @@ namespace SmallNet.Samples.BasicMove
             playerMap[id] = player;
         }
 
+        private void runInput()
+        {
+            if (this.Owner == NetworkSide.Client)
+            {
+
+                if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 1, 0));
+                }
+                if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, -1, 0));
+                }
+                if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, -1));
+                }
+                if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, 1));
+                }
+
+
+                if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.D))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, 0));
+                }
+                if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.A))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, 0));
+                }
+                if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.W))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, 0));
+                }
+                if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.S))
+                {
+                    this.sendMessage(new MsgVelocityChange(this, 0, 0));
+                }
+            }
+        }
+
         public override void update(Microsoft.Xna.Framework.GameTime time)
         {
-            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.D))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 1, 0));
-            }
-            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
-            {
-                this.sendMessage(new MsgVelocityChange(this, -1, 0));
-            }
-            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, -1));
-            }
-            if (keyboard.NewKeyDown(Microsoft.Xna.Framework.Input.Keys.S))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, 1));
-            }
 
-
-            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.D))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, 0));
-            }
-            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.A))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, 0));
-            }
-            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.W))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, 0));
-            }
-            if (keyboard.NewKeyUp(Microsoft.Xna.Framework.Input.Keys.S))
-            {
-                this.sendMessage(new MsgVelocityChange(this, 0, 0));
-            }
-
+            runInput();
             this.keyboard.Update();
 
 

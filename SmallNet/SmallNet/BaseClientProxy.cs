@@ -42,7 +42,7 @@ namespace SmallNet
             this.model = model;
             
             this.clientModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
-            this.clientModel.create(this.netWriter, "host");
+            this.clientModel.create(this.netWriter, NetworkSide.Host);
             clientModel.setId(id);
             this.startRecieverThread();
         }
