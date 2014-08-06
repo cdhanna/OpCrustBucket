@@ -11,23 +11,60 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
+    /// <summary>
+    /// The BaseClientProxy runs on the host, as a way to simulate what is happening the client machine. 
+    /// </summary>
+    /// <typeparam name="T">What kind of clientmodel the network project is using</typeparam>
     public class BaseClientProxy<T> : Id where T: ClientModel
     {
+        /// <summary>
+        /// Log object
+        /// </summary>
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
+        /// <summary>
+        /// The socket that is connected to the client
+        /// </summary>
         private Socket socket;
+
+        /// <summary>
+        /// Data written to this stream came from the client
+        /// </summary>
         private StreamReader netReader;
+
+        /// <summary>
+        /// Data written to this stream will go the client
+        /// </summary>
         private StreamWriter netWriter;
+
+        /// <summary>
+        /// The host model
+        /// </summary>
         private HostModel<T> model;
+
+        /// <summary>
+        /// Thread responsible for recieving messages off the netReader
+        /// </summary>
         private Thread recieverThread;
         public Boolean Debug { get; set; }
 
+        /// <summary>
+        /// client model
+        /// </summary>
         private T clientModel;
+
+        /// <summary>
+        /// unique id
+        /// </summary>
         private int id;
         public int Id { get { return this.id; } }
-        //public T ClientModel { get { return this.clientModel; } }
-
-
+       
+        /// <summary>
+        /// Creates a new client proxy.
+        /// </summary>
+        /// <param name="socket">The socket to use to create the net streams</param>
+        /// <param name="model">the host model that this proxy is a part of</param>
+        /// <param name="id">the unique id for the proxy.</param>
         public BaseClientProxy(Socket socket, HostModel<T> model, int id)
         {
             this.id = id;
@@ -56,10 +93,6 @@ namespace SmallNet
         public void kill()
         {
             Console.WriteLine("KILLING PROXY");
-            
-           // netReader.Dispose();
-            //recieverThread.Abort();
-            
             loop = false;
         }
 
@@ -81,11 +114,8 @@ namespace SmallNet
                     while (loop) //listen forever
                     {
                         string netMessage = netReader.ReadLine();
-                       // netReader.DiscardBufferedData();
                         log.Debug(this.clientModel.Owner + " recieved msg- " + netMessage);
-                        //Tuple<string, string[]> data = SNetUtil.decodeMessage(netMessage);
                         SMessage smessage = SNetUtil.decodeMessage(netMessage);
-                        //if (data.Item1.Equals(SNetProp.DISCONNECT_NOTIFICATION))
                         if (smessage is Messages.DisconnectionMessage)
                         {
                             loop = false;
@@ -127,21 +157,30 @@ namespace SmallNet
                 this.model.sendMessageToAll(message, rawMessage);
             }
             
-
         }
 
+        /// <summary>
+        /// send a message to the client
+        /// </summary>
+        /// <param name="message"></param>
         public void sendMessage(SMessage message)
         {
-            //string msg = SNetUtil.encodeMessage(msgType, parameters);
-            //this.netWriter.WriteLine(msg, parameters);
-            //log.Debug("send msg- " + msg);
             this.clientModel.sendMessage(message);
         }
+
+        /// <summary>
+        /// send a message to the client
+        /// </summary>
+        /// <param name="rawMessage">this string must be a well-formed SMessage serializable string</param>
         public void sendMessage(String rawMessage)
         {
             this.clientModel.sendMessage(rawMessage);
         }
 
+        /// <summary>
+        /// Updates the clientmodel in this proxy
+        /// </summary>
+        /// <param name="time"></param>
         public void update(GameTime time)
         {
             if (this.clientModel != null)
