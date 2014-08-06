@@ -24,7 +24,7 @@ namespace SmallNet
             //Messages.ConnectionMessage m2 = (Messages.ConnectionMessage)Serializer.deserialize(str);
             //SimpleNetTest test = new SimpleNetTest();
            // Test t = new Test();
-            using (var game = new Samples.BasicMove.BasicGame())
+            using (var game = new Test())
             {
                 game.Run();
             }
