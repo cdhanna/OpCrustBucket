@@ -1,0 +1,6 @@
+SMALL NET TODO
+
+-comment
+-del custom timer
+-del shutdown() in client
+-change basehost to listen on configurable ip, not always 0.0.0.0

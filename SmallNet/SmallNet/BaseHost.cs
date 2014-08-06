@@ -11,18 +11,42 @@ using Microsoft.Xna.Framework;
 namespace SmallNet
 {
    
+    /// <summary>
+    /// The base host of the SmallNet project
+    /// </summary>
+    /// <typeparam name="T">The type of client model that will be used in the SmallNet project</typeparam>
+    /// <typeparam name="H">The type of host model that will be used in the SmallNet project</typeparam>
     public class BaseHost<T, H> : Id where T:ClientModel where H :HostModel<T>
     {
+
+        /// <summary>
+        /// log object
+        /// </summary>
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-
+        /// <summary>
+        /// .NET class that handles incoming tcp connections
+        /// </summary>
         private TcpListener tcpListener;
+
+        /// <summary>
+        /// the ipaddress that the host is listening on
+        /// </summary>
         private string ipAddress;
+
+        /// <summary>
+        /// thread responsible for accepting new clients
+        /// </summary>
         private Thread clientAcceptorThread;
+
+        /// <summary>
+        /// true if the clientacceptor thread should be running
+        /// </summary>
         private bool clientAcceptorThreadRunner;
         
-        //private NetModel<T> model;
-
+        /// <summary>
+        /// the host model
+        /// </summary>
         private H hostModel;
 
         public Boolean Debug { get; set; }
@@ -34,20 +58,28 @@ namespace SmallNet
 
         public event EventHandler Connected;
 
+        /// <summary>
+        /// unique id. The host is always set to SNetProp.HOST_ID
+        /// </summary>
         public int Id { get { return SNetProp.HOST_ID; } }
 
+        /// <summary>
+        /// Create a new host
+        /// </summary>
         public BaseHost()
         {
-            //this.model = new NetModel<T>();
+
+            //create a new host model
             this.hostModel = (H)typeof(H).GetConstructor(new Type[] { }).Invoke(new object[] { });
             this.hostModel.init();
-            //this.clientModel.create(this.netWriter, "host");
 
-
-
+            //listen on all interfaces with 0.0.0.0
             this.tcpListener = new TcpListener(IPAddress.Parse("0.0.0.0"), SNetProp.getPort());
         }
 
+        /// <summary>
+        /// Start the host listening at the ip address.
+        /// </summary>
         public void start()
         {
 
@@ -58,8 +90,7 @@ namespace SmallNet
                 {
                     while (clientAcceptorThreadRunner)
                     {
-                        Console.WriteLine("waiting for connection form a client");
-
+                        
                         //accept a new client
                         Socket socket = tcpListener.AcceptSocket();
                         
@@ -67,13 +98,11 @@ namespace SmallNet
                         
 
                         //create clientProxy, which puts it into the model
-
                         BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);
                         client.sendMessage(new Messages.CreateNewModelMessage(this, client.Id));
                         this.hostModel.addClient(client);
                         
-                        //client.playerJoined(client);
-                        //client.sendMessage(new Messages.PlayerJoined(client));
+
                         client.Debug = Debug;
                         log.Debug("got a connection");
 
@@ -106,6 +135,9 @@ namespace SmallNet
             }
         }
 
+        /// <summary>
+        /// Shutdown the host. Clients will no longer be accepted. All clients will be disconnected from the client, and may experience turmoil and extreme unhappyness.
+        /// </summary>
         public void shutdown()
         {
             try
@@ -130,11 +162,10 @@ namespace SmallNet
             
         }
 
-        //public void sendMessageToAll(SMessage message)
-        //{
-        //    this.hostModel.sendMessageToAll(message);
-        //}
-
+        /// <summary>
+        /// Update the hostmodel
+        /// </summary>
+        /// <param name="time"></param>
         public void update(GameTime time)
         {
             this.hostModel.update(time);
