@@ -5,6 +5,9 @@ using System.Text;
 
 namespace SmallNet.Messages
 {
+    /// <summary>
+    /// simple message that notifies net machines of a new connection
+    /// </summary>
     class ConnectionMessage : SMessage
     {
 
@@ -17,7 +20,9 @@ namespace SmallNet.Messages
 
         public ConnectionMessage() : base() { }
 
-
+        /// <summary>
+        /// the credential string that the new client is trying to join with.
+        /// </summary>
         public String Credentials { get { return this.credentials; } }
 
     }

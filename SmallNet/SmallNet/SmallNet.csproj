@@ -76,7 +76,6 @@
     <Compile Include="DebugSession\Command_Disconnect.cs" />
     <Compile Include="DebugSession\Command_GetAllIP.cs" />
     <Compile Include="DebugSession\Command_HostAndClient.cs" />
-    <Compile Include="DebugSession\Command_SendMoveMsg.cs" />
     <Compile Include="DebugSession\Command_SendMsg.cs" />
     <Compile Include="DebugSession\Command_StartHost.cs" />
     <Compile Include="DebugSession\CommandOption.cs" />
@@ -94,7 +93,6 @@
     <Compile Include="HostModel.cs" />
     <Compile Include="LogWatcher.cs" />
     <Compile Include="MessageEventArgs.cs" />
-    <Compile Include="Messages\MoveMessage.cs" />
     <Compile Include="Messages\ConnectionMessage.cs" />
     <Compile Include="Messages\CreateNewModelMessage.cs" />
     <Compile Include="Messages\DisconnectionMessage.cs" />

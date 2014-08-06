@@ -44,8 +44,7 @@ namespace SmallNet.DebugSession
             this.df.addCommandOption(new Command_ConnectTo<T, H>());
             this.df.addCommandOption(new Command_Disconnect<T, H>());
             this.df.addCommandOption(new Command_SendMsg<T, H>());
-            this.df.addCommandOption(new Command_SendMoveMsg<T, H>());
-
+           
 
             this.formThread = new Thread(() =>
             {

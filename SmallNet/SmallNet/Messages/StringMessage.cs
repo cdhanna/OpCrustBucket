@@ -5,6 +5,9 @@ using System.Text;
 
 namespace SmallNet.Messages
 {
+    /// <summary>
+    /// Simple message that sends a string over the network
+    /// </summary>
     class StringMessage : SMessage
     {
         private String msg;
@@ -15,6 +18,9 @@ namespace SmallNet.Messages
         }
         public StringMessage() : base() { }
 
+        /// <summary>
+        /// the string that was sent over the network
+        /// </summary>
         public String Message { get { return this.msg; } }
 
         public override string ToString()
