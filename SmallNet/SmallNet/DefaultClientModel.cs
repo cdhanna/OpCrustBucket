@@ -27,10 +27,6 @@ namespace SmallNet
         /// </summary>
         private NetworkSide name;
 
-        /// <summary>
-        /// DEPRECATED
-        /// </summary>
-        private System.Timers.Timer timer;
 
         /// <summary>
         /// the stream to write data to the host
@@ -50,7 +46,7 @@ namespace SmallNet
         /// </summary>
         public DefaultClientModel()
         {
-            this.timer = new System.Timers.Timer();
+            
         }
 
         /// <summary>
@@ -77,10 +73,6 @@ namespace SmallNet
             this.name = owner;
             this.netWriter = netWriter;
 
-            //todo, destroy timer
-            this.timer.AutoReset = true;
-            this.timer.Interval = this.TargetTime;
-            this.timer.Enabled = true;
 
 
             //call init, which new implementations must define
@@ -173,13 +165,5 @@ namespace SmallNet
             log.Debug(this.Owner + " send msg- " + rawMessage);
         }
 
-        /// <summary>
-        /// DEPRECATED
-        /// </summary>
-        public void keepTime()
-        {
-
-
-        }
     }
 }

@@ -94,7 +94,6 @@ namespace SmallNet
             log.Debug(" connection timeout");
             this.connectTimer.Enabled = false;
             this.tcp.Close();
-            //sock.Close();
         }
 
        

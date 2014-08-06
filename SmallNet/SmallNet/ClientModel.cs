@@ -16,11 +16,7 @@ namespace SmallNet
         /******
          * FIELDS
          ******/
-        
-        /// <summary>
-        /// @DEPRECATED 
-        /// </summary>
-        double TargetTime { get; set; }
+       
 
         /// <summary>
         /// Reveals if this client model is running on a client machine, or a host machine
@@ -53,11 +49,7 @@ namespace SmallNet
         /// Called after creation of the model
         /// </summary>
         void init();
-        
-        /// <summary>
-        /// @DEPRECATED
-        /// </summary>
-        void keepTime();
+       
 
         /// <summary>
         /// Called every update tick
