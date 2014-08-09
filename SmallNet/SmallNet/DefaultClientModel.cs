@@ -38,6 +38,10 @@ namespace SmallNet
         /// </summary>
         private int id;
 
+
+        private Dictionary<int, DefaultPlayer> playerMap;
+        private List<int> playerIds;
+
         private EventHandler<MessageEventArgs> messageRecieved;
         public EventHandler<MessageEventArgs> MessageRecieved { get { return this.messageRecieved; } set { this.messageRecieved = value; } }
 
@@ -46,20 +50,44 @@ namespace SmallNet
         /// </summary>
         public DefaultClientModel()
         {
-            
+            //set player states
+            playerMap = new Dictionary<int, DefaultPlayer>();
+            playerIds = new List<int>();
         }
 
-        /// <summary>
-        /// DEPRECATED
-        /// </summary>
-        public double TargetTime
-        {
-            get;
-            set;
-        }
+     
 
         public NetworkSide Owner { get{ return this.name;} }
         public int Id { get { return this.id; } }
+
+        /// <summary>
+        /// add a player the model's player table
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="player"></param>
+        public void addPlayer(int id, DefaultPlayer player)
+        {
+            playerIds.Add(id);
+            playerMap[id] = player;
+        }
+
+        /// <summary>
+        /// a helper function template
+        /// </summary>
+        /// <param name="plr"></param>
+        delegate void PlayerFunc<X>(X plr) where X : DefaultPlayer;
+
+        /// <summary>
+        /// Runs a function for all joined players
+        /// </summary>
+        /// <param name="d"></param>
+        private void doForAllPlayers<X>(PlayerFunc<X> d) where X : DefaultPlayer
+        {
+            foreach (int player in this.playerIds)
+            {
+                d.Invoke((X)this.playerMap[player]);
+            }
+        }
 
 
         /// <summary>
@@ -69,7 +97,6 @@ namespace SmallNet
         /// <param name="owner"></param>
         public void create(StreamWriter netWriter, NetworkSide owner)
         {
-            this.TargetTime = 30;
             this.name = owner;
             this.netWriter = netWriter;
 
@@ -164,6 +191,6 @@ namespace SmallNet
             this.netWriter.Flush();
             log.Debug(this.Owner + " send msg- " + rawMessage);
         }
-
+        
     }
 }

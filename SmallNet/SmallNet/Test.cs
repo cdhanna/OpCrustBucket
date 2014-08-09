@@ -35,9 +35,6 @@ namespace SmallNet
         public Test()
             : base()
         {
-
-            Console.WriteLine("TWTSDFS");
-
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -119,7 +116,7 @@ namespace SmallNet
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
 

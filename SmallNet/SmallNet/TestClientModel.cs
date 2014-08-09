@@ -36,12 +36,12 @@ namespace SmallNet
 
         protected override void gotMessage(SMessage message)
         {
-            log.Debug(this.Owner + " : onMessage " + message);
+            //log.Debug(this.Owner + " : onMessage " + message);
         }
 
         public override void playerJoined(int id)
         {
-            
+            Console.WriteLine("PLAYER JOINED THE CLIENT MODEL "+ this.Id+ " : " + id);
         }
     }
 }

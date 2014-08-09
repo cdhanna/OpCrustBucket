@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using System.Net.Sockets;
-
+using System.IO;
 
 namespace SmallNet
 {
@@ -33,6 +33,10 @@ namespace SmallNet
 
         private int clientIdIncer = SNetProp.HOST_ID ;
 
+        private T mainModel;
+        private StreamWriter mainStreamWriter;
+        private StreamReader mainStreamReader;
+        private Stream mainMemoryStream;
 
         /// <summary>
         /// Create a new default host model
@@ -41,6 +45,20 @@ namespace SmallNet
         {
             this.clients = new List<BaseClientProxy<T>>();
             this.clientIdTable = new Dictionary<int, BaseClientProxy<T>>();
+
+            //create the mainModel (the one with id=hostId
+            mainMemoryStream = new MemoryStream();
+            this.mainStreamWriter = new StreamWriter(mainMemoryStream);
+            this.mainStreamReader = new StreamReader(mainMemoryStream);
+            SNetUtil.configureStreams(this.mainStreamReader, this.mainStreamWriter);
+
+
+            this.mainModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
+            this.mainModel.create(this.mainStreamWriter, NetworkSide.Host);
+            mainModel.setId(SNetProp.HOST_ID);
+
+            
+
         }
 
         /// <summary>
@@ -71,6 +89,9 @@ namespace SmallNet
         /// <param name="client"></param>
         public void addClient(BaseClientProxy<T> client)
         {
+
+            //tell the main model about the new client
+            this.mainModel.playerJoined(client.Id);
 
             //tell the new client about all the existing clients
             foreach (BaseClientProxy<T> proxy in this.clients)
@@ -136,10 +157,28 @@ namespace SmallNet
         /// <param name="time"></param>
         public void update(GameTime time)
         {
-            foreach (BaseClientProxy<T> proxy in this.clients)
+            //foreach (BaseClientProxy<T> proxy in this.clients) //NOTE: Taken out in dev testing. in favor of using ONE client model that represents the entire host model.
+            //{
+            //    proxy.update(time);
+            //} 
+
+            this.mainModel.update(time);
+            
+            //read data from stream until there is none left
+            string rawMsg = "";
+            while ((rawMsg = this.mainStreamReader.ReadLine()) != null)
             {
-                proxy.update(time);
+                //send message to all clients
+                foreach (BaseClientProxy<T> proxy in this.clients)
+                {
+                    proxy.sendMessage(rawMsg);
+                }
+
+                //send message back to main model so it is approved
+                this.mainModel.sendMessage(rawMsg);
             }
+
+
             this.updateHost(time);
         }
 
