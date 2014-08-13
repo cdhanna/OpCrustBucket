@@ -9,7 +9,7 @@ namespace SmallNet
     /// <summary>
     /// A collection of SmallNet related constants. 
     /// </summary>
-    class SNetProp
+    public class SNetProp
     {
         //TODO, convert all of this to read in from an .xml file
 

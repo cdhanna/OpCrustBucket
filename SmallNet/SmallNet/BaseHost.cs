@@ -32,7 +32,7 @@ namespace SmallNet
         /// <summary>
         /// the ipaddress that the host is listening on
         /// </summary>
-        private string ipAddress;
+        private string ipAddress = "0.0.0.0";
 
         /// <summary>
         /// thread responsible for accepting new clients
@@ -50,7 +50,7 @@ namespace SmallNet
         private H hostModel;
 
         public Boolean Debug { get; set; }
-        public string IpAddress { get { return this.ipAddress; } }
+        public string IpAddress { get { return this.ipAddress; } set { this.ipAddress = value; } }
 
         public H Model { get { return this.hostModel; } }
         private bool isRunning;
@@ -73,8 +73,7 @@ namespace SmallNet
             this.hostModel = (H)typeof(H).GetConstructor(new Type[] { }).Invoke(new object[] { });
             this.hostModel.init();
 
-            //listen on all interfaces with 0.0.0.0
-            this.tcpListener = new TcpListener(IPAddress.Parse("0.0.0.0"), SNetProp.getPort());
+           
         }
 
         /// <summary>
@@ -82,7 +81,8 @@ namespace SmallNet
         /// </summary>
         public void start()
         {
-
+            //listen on all interfaces with 0.0.0.0
+            this.tcpListener = new TcpListener(IPAddress.Parse(this.IpAddress), SNetProp.getPort());
             this.clientAcceptorThread = new Thread(() =>
             {
                 log.Debug("client acceptor thread is starting...");
@@ -95,7 +95,9 @@ namespace SmallNet
                         Socket socket = tcpListener.AcceptSocket();
                         
                         socket.NoDelay = true;
-                        
+
+                        Console.WriteLine("CLIENT JOINED HOST");
+
 
                         //create clientProxy, which puts it into the model
                         BaseClientProxy<T> client = this.hostModel.generateNewClient(socket);

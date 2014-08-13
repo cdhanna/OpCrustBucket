@@ -14,7 +14,7 @@ namespace SmallNet
     /// The default client model that will be run on SmallNet projects. It is recommended that everytime a new SmallNet project is started, the ClientModel uses this class as a base.
     /// WARNING: ALL implementations must have a no-arg constructor. That is what will be used to construct the client model
     /// </summary>
-    public abstract class DefaultClientModel : ClientModel
+    public abstract class DefaultClientModel<P> : ClientModel where P : DefaultPlayer
     {
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace SmallNet
         private int id;
 
 
-        private Dictionary<int, DefaultPlayer> playerMap;
+        private Dictionary<int, P> playerMap;
         private List<int> playerIds;
 
         private EventHandler<MessageEventArgs> messageRecieved;
@@ -51,7 +51,7 @@ namespace SmallNet
         public DefaultClientModel()
         {
             //set player states
-            playerMap = new Dictionary<int, DefaultPlayer>();
+            playerMap = new Dictionary<int, P>();
             playerIds = new List<int>();
         }
 
@@ -65,7 +65,7 @@ namespace SmallNet
         /// </summary>
         /// <param name="id"></param>
         /// <param name="player"></param>
-        public void addPlayer(int id, DefaultPlayer player)
+        public void addPlayer(int id, P player)
         {
             playerIds.Add(id);
             playerMap[id] = player;
@@ -75,17 +75,17 @@ namespace SmallNet
         /// a helper function template
         /// </summary>
         /// <param name="plr"></param>
-        delegate void PlayerFunc<X>(X plr) where X : DefaultPlayer;
+        protected delegate void PlayerFunc(P plr);
 
         /// <summary>
         /// Runs a function for all joined players
         /// </summary>
         /// <param name="d"></param>
-        private void doForAllPlayers<X>(PlayerFunc<X> d) where X : DefaultPlayer
+        private void doForAllPlayers(PlayerFunc d)
         {
             foreach (int player in this.playerIds)
             {
-                d.Invoke((X)this.playerMap[player]);
+                d.Invoke(this.playerMap[player]);
             }
         }
 

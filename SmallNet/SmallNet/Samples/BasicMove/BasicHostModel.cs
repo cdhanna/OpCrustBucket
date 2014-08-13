@@ -34,5 +34,10 @@ namespace SmallNet.Samples.BasicMove
         {
             
         }
+
+        public override void playerJoined(int id)
+        {
+            
+        }
     }
 }

@@ -123,7 +123,7 @@ namespace SmallNet
                 //connect the client
                 tcp = new TcpClient(hostIpAddress, SNetProp.getPort());
                 tcp.Client.NoDelay = true;
-
+                Console.WriteLine("CLIENT CONNECTED");
             }
             catch (SocketException e)
             {
@@ -259,7 +259,7 @@ namespace SmallNet
                     NewModel(this, new EventArgs());
                 }
                 this.connected = true;
-
+                Console.WriteLine("CLIENT MODEL CREATED");
                 this.fireConnected();
             }
             else if (message is Messages.DisconnectionMessage)

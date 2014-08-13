@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace SmallNet.Samples.BasicMove
 {
-    class BasicClientModel : DefaultClientModel, Id
+    class BasicClientModel : DefaultClientModel<DefaultPlayer>, Id
     {
 
         private Dictionary<int, BasicPlayer> playerMap;

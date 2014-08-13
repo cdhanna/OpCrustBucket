@@ -8,7 +8,7 @@ namespace SmallNet.Messages
     /// <summary>
     /// Simple message that sends a string over the network
     /// </summary>
-    class StringMessage : SMessage
+    public class StringMessage : SMessage
     {
         private String msg;
         public StringMessage(Id id, String msg)

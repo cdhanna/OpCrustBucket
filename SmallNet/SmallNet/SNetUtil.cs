@@ -14,7 +14,7 @@ namespace SmallNet
     /// <summary>
     /// A collection of SmallNet utility functions
     /// </summary>
-    class SNetUtil
+    public class SNetUtil
     {
         /// <summary>
         /// log object

@@ -32,5 +32,10 @@ namespace SmallNet
         {
             //throw new NotImplementedException();
         }
+
+        public override void playerJoined(int id)
+        {
+            
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace SmallNet
     /// WARNING: all implementations must have a no-arg constructor.
     /// </summary>
     /// <typeparam name="T">The type of client model being used with the SmallNet project</typeparam>
-    abstract class DefaultHostModel<T> : HostModel<T> where T:ClientModel
+    public abstract class DefaultHostModel<T> : HostModel<T>, Id where T:ClientModel
     {
         /// <summary>
         /// A list of all the clients running on the host
@@ -23,7 +23,7 @@ namespace SmallNet
         /// <summary>
         /// A map of all client IDs on the host, pointing to the client with the same ID
         /// </summary>
-        private Dictionary<int, BaseClientProxy<T>> clientIdTable;
+        protected Dictionary<int, BaseClientProxy<T>> clientIdTable;
         
         /// <summary>
         /// the number of connected clients
@@ -51,7 +51,7 @@ namespace SmallNet
             this.mainStreamWriter = new StreamWriter(mainMemoryStream);
             this.mainStreamReader = new StreamReader(mainMemoryStream);
             SNetUtil.configureStreams(this.mainStreamReader, this.mainStreamWriter);
-
+            
 
             this.mainModel = (T)typeof(T).GetConstructor(new Type[] { }).Invoke(new object[] { });
             this.mainModel.create(this.mainStreamWriter, NetworkSide.Host);
@@ -90,6 +90,7 @@ namespace SmallNet
         public void addClient(BaseClientProxy<T> client)
         {
 
+
             //tell the main model about the new client
             this.mainModel.playerJoined(client.Id);
 
@@ -101,7 +102,7 @@ namespace SmallNet
 
 
             this.clients.Add(client);
-            this.clientIdTable[clientIdIncer] = client;
+            this.clientIdTable[client.Id] = client;
 
             //tell the clients about the new client
             foreach (BaseClientProxy<T> proxy in this.clients)
@@ -109,7 +110,13 @@ namespace SmallNet
            
                 proxy.playerJoined(client);
             }
+
+            this.playerJoined(client.Id);
+
         }
+
+        public abstract void playerJoined(int id);
+
 
         /// <summary>
         /// remove a client from the model
@@ -225,5 +232,10 @@ namespace SmallNet
         public abstract void onMessage(SMessage message);
 
 
+
+        public int Id
+        {
+            get { return SNetProp.HOST_ID; }
+        }
     }
 }

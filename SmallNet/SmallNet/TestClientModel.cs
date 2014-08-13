@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace SmallNet
 {
-    public class TestClientModel : DefaultClientModel
+    public class TestClientModel : DefaultClientModel<DefaultPlayer>
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         
