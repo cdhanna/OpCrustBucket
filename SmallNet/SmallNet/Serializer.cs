@@ -109,7 +109,8 @@ namespace SmallNet
 
                 else // its an object that needs its own call to writeLine()
                 {
-                    str += (f.FieldType.ToString() + SEP + f.Name);
+                    //string str2 = Assembly.CreateQualifiedName(f.FieldType.Assembly.ToString(), f.FieldType.ToString());
+                    str += (f.FieldType.AssemblyQualifiedName.ToString() + SEP + f.Name);
                     str += writeLine(f.GetValue(obj));
                     str += RHS;
                 }
@@ -148,7 +149,7 @@ namespace SmallNet
             // Provides book keeping data for the message.
             string str = "";
             str += HEADBEG
-                + OBJTYPE + obj.GetType().ToString()
+                + OBJTYPE + obj.GetType().AssemblyQualifiedName.ToString()
                 + HEADEND;
             return str;
         }
