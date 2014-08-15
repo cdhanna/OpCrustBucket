@@ -19,9 +19,9 @@ namespace SmallNet
         [STAThread]
         static void Main()
         {
-            Messages.ConnectionMessage m1 = new Messages.ConnectionMessage(new DummyIdClass(),"Howdy");
-            string str = Serializer.serialize(m1);
-            Messages.ConnectionMessage m2 = (Messages.ConnectionMessage)Serializer.deserialize(str);
+            //Messages.DummyMessage m1 = new Messages.DummyMessage(new DummyIdClass(),"Howdy",2.2f,3.0f);
+            //string str = Serializer.serialize(m1);
+            //Messages.DummyMessage m2 = (Messages.DummyMessage)Serializer.deserialize(str);
             //SimpleNetTest test = new SimpleNetTest();
            // Test t = new Test();
             using (var game = new Test())

@@ -140,7 +140,8 @@ namespace SmallNet
             if (body.Length != MSGEND.Length)
             {
                 body = body.Substring(0, body.Length - MSGEND.Length);
-                writeVal(body, obj); // recursively does all the work.
+                obj = writeVal(body, obj); // recursively does all the work.
+                
             }
         }
 
@@ -169,7 +170,7 @@ namespace SmallNet
             return MSGEND;
         }
 
-        private static void writeVal(string msg, Object obj)
+        private static Object writeVal(string msg, Object obj)
         {
             Type data = obj.GetType();
             List<FieldInfo> fields = data.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).ToList<FieldInfo>();
@@ -258,15 +259,20 @@ namespace SmallNet
                                     else
                                     {
                                         str = str.Substring(str.IndexOf(LHS));
-                                        writeVal(str, f.GetValue(obj));
+                                        // idiot debug steps..
+                                        //Object obj2 = f.GetValue(obj); // empty vec2
+                                        //Object obj3 = writeVal(str, f.GetValue(obj)); // populated vec2
+
+                                        f.SetValue(obj, writeVal(str, f.GetValue(obj)));
                                     }   
                                 }
                             }
                             break;
                         }
                 }
-               
-                    msg = msg.Substring(str.Length + LHS.Length + RHS.Length);
+
+                msg = msg.Substring(msg.IndexOf(str) + str.Length + RHS.Length);
+                    //msg = msg.Substring(str.Length + LHS.Length + RHS.Length);
                     if (msg.IndexOf(LHS) != -1)
                     {
                         str = getNextObj(msg, LHS, RHS);
@@ -277,6 +283,7 @@ namespace SmallNet
                         str = "";
                     }
             }
+            return obj;
         }
 
         private static string getNextObj(string msg, string left, string right)
@@ -329,6 +336,7 @@ namespace SmallNet
             String f;
             while (msg.Length != 0)
             {
+                string remStr = "";
                 // if its the value for a string (2 part check may be over kill?)
                 if ( msg.IndexOf(STRHDR) >= 0 &&  msg.Substring(0, STRHDR.Length).Equals(STRHDR))
                 {
@@ -340,16 +348,32 @@ namespace SmallNet
                 }
                 else
                 {
-                    if (msg.IndexOf(delim) > 0)
-                        f = msg.Substring(0, msg.IndexOf(delim));
+                    int leftIndex = msg.IndexOf(LHS);
+                    int delimIndex = msg.IndexOf(delim);
+                    
+                    if (leftIndex > 0 && delimIndex > 0)
+                    {
+                        f = msg.Substring(0, Math.Min(leftIndex, delimIndex));
+                        remStr = leftIndex < delimIndex ? LHS : delim;
+                    }
+                    else if (leftIndex > 0)
+                    {
+                        f = msg.Substring(0, leftIndex);
+                        remStr = LHS;
+                    }
+                    else if (delimIndex > 0)
+                    {
+                        f = msg.Substring(0, delimIndex);
+                        remStr = delim;
+                    }
                     else
                         f = msg;
                 }
-                fields.Add(f);
+                fields.Add(f.Replace(RHS,""));
                 msg = msg.Substring(f.Length);
                 if (msg.Length != 0)
                 {
-                    msg = msg.Substring(delim.Length);
+                    msg = msg.Substring(remStr.Length);
                 }
             }
             return fields;
