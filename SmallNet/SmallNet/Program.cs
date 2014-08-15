@@ -24,6 +24,7 @@ namespace SmallNet
             //Messages.DummyMessage m2 = (Messages.DummyMessage)Serializer.deserialize(str);
             //SimpleNetTest test = new SimpleNetTest();
            // Test t = new Test();
+            
             using (var game = new Test())
             {
                 game.Run();

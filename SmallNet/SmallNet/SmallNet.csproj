@@ -75,6 +75,7 @@
     </StartupObject>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup />
   <ItemGroup>
     <Compile Include="BaseClient.cs" />
     <Compile Include="BaseClientProxy.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Messages\CreateNewModelMessage.cs" />
     <Compile Include="Messages\DisconnectionMessage.cs" />
     <Compile Include="Messages\DummyMessage.cs" />
+    <Compile Include="Messages\DummySubObject.cs" />
     <Compile Include="Messages\PlayerJoined.cs" />
     <Compile Include="Messages\StringMessage.cs" />
     <Compile Include="NetworkSide.cs" />

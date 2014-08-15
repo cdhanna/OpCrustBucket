@@ -259,10 +259,14 @@ namespace SmallNet
                                     else
                                     {
                                         str = str.Substring(str.IndexOf(LHS));
-                                        // idiot debug steps..
-                                        //Object obj2 = f.GetValue(obj); // empty vec2
-                                        //Object obj3 = writeVal(str, f.GetValue(obj)); // populated vec2
 
+                                        // null check and remediation
+                                        if (f.GetValue(obj) == null)
+                                        {
+                                            Type tt = f.FieldType;
+                                            ConstructorInfo c = tt.GetConstructor(new Type[] { });
+                                            f.SetValue(obj, c.Invoke(new object[] { }));
+                                        }
                                         f.SetValue(obj, writeVal(str, f.GetValue(obj)));
                                     }   
                                 }
